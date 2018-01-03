@@ -18,7 +18,6 @@ export default {
 
     var productionMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
       let ar = [_1, _2, _3, _4];
-      console.log(_1, _2, _3, _4)
       state.mqtt = ar;
     });
         

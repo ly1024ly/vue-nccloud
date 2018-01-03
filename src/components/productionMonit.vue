@@ -3,7 +3,8 @@
     <el-card class="box-card" v-for="(item,index) in focus" :key="index">
         <p>{{item.alias}}</p>
         <div class="uuid">{{item.uuid}}</div>
-        <div class="pres">加工进度{{typeof(mqtt)}}</div>
+        <div class="pres">加工进度</div>
+        <div class="val" v-for="(it,indexs) in mqtuuid" v-if="it.uuid==item.uuid" :key="indexs" >{{it.value=="Running" ? "0%" : it.value +"%"}}</div>
     </el-card>
   </div>
 </template>
@@ -23,6 +24,7 @@ import md5 from 'js-md5'
   export default {
     data() {
       return {
+        mqtuuid:[],
         focus:[]
       }
     },
@@ -33,6 +35,30 @@ import md5 from 'js-md5'
     },
     methods:{
       ...mapMutations(['FOCUS_MACHINE','MQTT']),
+      initData(uuid,press){
+        if(this.mqtuuid.length!==0){
+          let flag = true;
+          this.mqtuuid.forEach(function(val){
+            if(val.uuid==uuid){
+              flag = false;
+              console.log(val)
+              val.value = press;
+            }
+          })
+          if(flag){
+            let obj = {};
+            obj.uuid = uuid;
+            obj.value = press
+            console.log(this.mqtuuid)
+            this.mqtuuid.push(obj)
+          }
+        }else if(this.mqtuuid.length==0){
+            let obj = {}
+            obj.uuid = uuid;
+            obj.value = press
+          this.mqtuuid.push(obj)
+        }
+      },
       open() {
         this.$alert('没有添加关注设备，请添加关注设备!', '温馨提示', {
           confirmButtonText: '确定',
@@ -77,7 +103,10 @@ import md5 from 'js-md5'
         })
     },
     watch:{
+      mqtt:function(value){
 
+        this.initData(value[0],value[2])
+      }
     }
   }
 </script>
