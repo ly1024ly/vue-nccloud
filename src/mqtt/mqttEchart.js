@@ -1,6 +1,5 @@
 'use strict'
 var mqtt = require('mqtt')
-import { connect } from 'mqtt';
 const NCMQTTURL = "wss://mqtt.nccloud.weihong.com.cn";
 const NCMQTTPORT = Number(8883);
 class NcMqttClient {

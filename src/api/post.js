@@ -1,12 +1,7 @@
 import fetch from 'isomorphic-fetch'
+import axios from 'axios'
 
-export default function post(url,data){
-    return fetch(url,{
-      method:'POST',
-        headers:{
-          'Accept':'application/json',
-          'Content-Type':'application/json'
-        },
-        body:data    
-    })
+
+export default function post(url,param){
+  return axios.post(url,param)
 }

@@ -4,10 +4,7 @@ import {
   MQTT
 } from './mutation-types.js'
 import NcMqttClient from '../mqtt/mqttEchart.js';
-var mqtt = require('mqtt')
-const NCMQTTURL = "wss://mqtt.nccloud.weihong.com.cn";
-const NCMQTTPORT = Number(8883);
-
+import md5 from 'js-md5'
 
 export default {
 	[USER_INFO](state,user){
@@ -17,19 +14,14 @@ export default {
     state.focMachine = machine;
   },
   [MQTT](state,arr){
-    function fn(a,b,c,d){
-     console.log(a + " " + b + " " + c + " " +d)
-    };
-    var productionMqtt = new NcMqttClient("ly1024", "ly1024", function(_1, _2, _3, _4) {
-      console.log("111111111111111")
-      fn(_1, _2, _3, _4)  
-      console.log(_1, _2, _3, _4)     
+    let pass = md5("ly1024");
+
+    var productionMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
+      let ar = [_1, _2, _3, _4];
+      console.log(_1, _2, _3, _4)
+      state.mqtt = ar;
     });
-    console.log(productionMqtt)
-
-    console.log(arr)
+        
     productionMqtt.connect(arr)
-   
-}
-
+  }
 }

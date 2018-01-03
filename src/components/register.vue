@@ -55,6 +55,7 @@
 <script>
 import axios from 'axios'
 import {mapActions,mapGetters,mapMutations} from 'vuex'
+import md5 from 'js-md5'
   export default {
     data() {
     	var checkname = (rule,value,callback) => {
@@ -181,7 +182,7 @@ import {mapActions,mapGetters,mapMutations} from 'vuex'
           	obj.address = this.ruleForm.addr;
           	obj.company = this.ruleForm.company;
           	obj.email = this.ruleForm.email;
-          	obj.password = this.ruleForm.pass;
+          	obj.password = md5(this.ruleForm.pass);
             axios.post('https://nccloud.weihong.com.cn/ncmes/web/register',obj).then(function(res){
             	if(res.data.result=="success"){
                 _this.USER_INFO(obj);

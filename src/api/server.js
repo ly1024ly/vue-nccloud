@@ -5,7 +5,7 @@ import post from './post.js';
 import get from './get.js';
 
 export const userLogin = param => {
-  return post(`${base}/web/login`,param)   
+  return post(`${base}/web/login`,param)
 }
  
 export const vercode = param => {

@@ -28,12 +28,14 @@
       obj.username = "ly1024";
       obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTYyMzM2MDAsImlhdCI6MTUxMzY0ODAxM30.lv9HRoXgamAi-Xw4aWgU0Wpr1hMoRRHd67nUcf7vPLw"
       api.htrMsg(obj)
-        .then(res => res.json())
-        .then(json => {
-            if(json.result=="success"){
-              this.card = json.value;
-              console.log(json)
+        .then(res => {
+            if(res.data.result=="success"){
+              this.card = res.data.value;
+              console.log(res)
             }
+        })
+        .catch(err => {
+
         })
     },
     methods:{

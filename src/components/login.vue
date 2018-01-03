@@ -31,6 +31,7 @@
   import * as api from '../api/server.js';
   import {mapState, mapGetters,mapMutations} from 'vuex'
   import axios from 'axios'
+  import md5 from 'js-md5'
   export default {
     data() {
       var checkAge = (rule, value, callback) => {
@@ -49,8 +50,6 @@
     		let flag = rul.test(value);
     		if(value===""){
     			callback(new Error('帐号不能为空'))
-    		}else if(!flag){
-    			callback(new Error( "帐号格式错误"))
     		}else{
     			callback();
     		}
@@ -97,7 +96,18 @@
       ...mapState(['user']),
     },
     methods: {
-       ...mapMutations(['USER_INFO']),
+      ...mapMutations(['USER_INFO']),
+      open(msg){
+        this.$alert(msg, '', {
+          confirmButtonText: '确定',
+          callback: action => {
+            this.$message({
+              type: 'info',
+              message: `action: ${ action }`
+            });
+          }
+        });
+      },
       submitForm(formName) {
       console.log(this.user)
         this.$refs[formName].validate((valid) => {
@@ -105,16 +115,22 @@
           if (valid) {
             const obj = {};
             obj.account = this.ruleForm2.phone;
-            obj.password = this.ruleForm2.checkPass;
-            obj.vercode = this.ruleForm2.age;
-            api.userLogin(obj).then((res) => {
-                if(res.ok){
-                    res.json().then(res => {
-                         _this.setCookies(obj);
-                        _this.$router.push({path:'/warning'})
-                    })
+            obj.password = md5(this.ruleForm2.checkPass);
+            obj.vercode = this.ruleForm2.age.toString();
+            console.log(obj)
+            api.userLogin(obj)
+              .then(function(res){
+                if(res.data.result=="success"){
+                  _this.setCookies(obj);
+                  _this.$router.push({path:'/warning'})
+                }else{
+                  _this.open(res.data.message)
                 }
-            });
+              })
+              .catch(function(err){
+
+              })
+           
           } else {
             console.log('error submit!!');
             return false;
@@ -164,11 +180,22 @@
               pam.phone = this.ruleForm2.phone;
               pam.num = this.num;
               api.vercode(pam)
-                  .then(res => res.json())
-                  .then(json => {
-                      console.log(json)
-                      _this.num++
-                  })
+                .then(function(res){
+                  if(res.data.result=="success"){
+                    _this.open("发送成功！")
+                  }else{
+                    _this.open(res.data.message)
+                    clearInterval(interval);
+                    _this.message = "免费获取验证码";
+                    _this.class = ""
+                  }
+                })
+                .catch(function(err){
+                  _this.open(res.data.message)
+                  clearInterval(interval);
+                  _this.message = "免费获取验证码";
+                  _this.class = ""
+                })  
 	      	}      	
       	}
     	}
