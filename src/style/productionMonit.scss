@@ -1,0 +1,36 @@
+$center:center;
+.pm{
+
+  display:flex;
+  flex-wrap:wrap;
+  .text {
+    font-size: 14px;
+  }
+
+  .item {
+    padding: 18px 0;
+    text-align:$center;
+  }
+  .box-card {
+    color:#717171;
+    width: 350px;
+    div.el-card__body{
+      padding:10px!important;
+      text-align:$center;
+      .uuid{
+        text-align:$center;
+        font-size:14px;
+        margin:8px 0px 20px 0px;
+      }
+      .pres{
+        text-align:$center;
+        font-size:12px;
+      }
+      p{
+        text-align:$center;
+        font-size:18px;
+        margin:2px;
+      }
+    }
+  }
+}

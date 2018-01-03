@@ -1,0 +1,24 @@
+
+$inline:inline-block;
+a.router-link-exact-active{
+	text-decoration: none!important;
+  color:orange;
+}
+.el-menu a{
+	text-decoration: none!important;
+}
+.el-header{
+  ul{
+    display:$inline;
+    position:absolute;
+    left:0px;
+    margin:0px;
+    li{
+      width:90px;
+      text-align:center;
+      background:orange;
+      color:#fff;
+      display:inline-block;
+    }
+  }
+}
