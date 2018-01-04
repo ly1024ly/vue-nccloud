@@ -15,7 +15,7 @@
       <el-menu >
         
       <el-menu-item index="1" @click="warning('warning')" >
-        <i class="el-icon-menu"></i>
+        <i class="el-icon-bell"></i>
         <span slot="title">消息报警</span>
       </el-menu-item>
     

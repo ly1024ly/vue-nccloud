@@ -1,6 +1,12 @@
 <template>
   <div class="pm">
     <el-card class="box-card" v-for="(item,index) in focus" :key="index">
+        <div class="stat" v-for="(it,indexs) in mqtuuid" v-if="it.uuid==item.uuid">
+          <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}"></span>
+          <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}"></span>
+          <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}"></span>
+          <span v-else="" :style="{background:'gray'}"></span>
+        </div>
         <p>{{item.alias}}</p>
         <div class="uuid">{{item.uuid}}</div>
         <div class="pres">加工进度</div>
@@ -25,7 +31,8 @@ import md5 from 'js-md5'
     data() {
       return {
         mqtuuid:[],
-        focus:[]
+        focus:[],
+        color:"green"
       }
     },
     computed:{
@@ -35,27 +42,28 @@ import md5 from 'js-md5'
     },
     methods:{
       ...mapMutations(['FOCUS_MACHINE','MQTT']),
-      initData(uuid,press){
+      initData(uuid,press,status){
         if(this.mqtuuid.length!==0){
           let flag = true;
           this.mqtuuid.forEach(function(val){
             if(val.uuid==uuid){
               flag = false;
-              console.log(val)
               val.value = press;
+              val.status = status;
             }
           })
           if(flag){
             let obj = {};
             obj.uuid = uuid;
-            obj.value = press
-            console.log(this.mqtuuid)
+            obj.value = press;
+            obj.status = status;
             this.mqtuuid.push(obj)
           }
         }else if(this.mqtuuid.length==0){
             let obj = {}
             obj.uuid = uuid;
-            obj.value = press
+            obj.status = status;
+            obj.value = press;
           this.mqtuuid.push(obj)
         }
       },
@@ -89,8 +97,6 @@ import md5 from 'js-md5'
               obj.item = [value.item,"WHstatus_ExecState"];
               obj.enable = true;
               arr.push(obj);
-              console.log("=====================")
-              console.log(arr)
             })
             this.focus = res.data.values;
             this.FOCUS_MACHINE(res.data.values);
@@ -104,8 +110,11 @@ import md5 from 'js-md5'
     },
     watch:{
       mqtt:function(value){
-
-        this.initData(value[0],value[2])
+        console.log(value)
+        this.initData(value[0],value[2],value[1])
+      },
+      mqtuuid(value){
+        console.log(value)
       }
     }
   }
