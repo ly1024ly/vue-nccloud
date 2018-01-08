@@ -7,7 +7,13 @@ a.router-link-exact-active{
 .el-menu a{
 	text-decoration: none!important;
 }
+.bgcolor{
+  background: rgb(44, 52, 60);
+}
 .el-header{
+  .title{
+    text-align:center;
+  }
   ul{
     display:$inline;
     position:absolute;

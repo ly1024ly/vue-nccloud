@@ -1,6 +1,7 @@
 <template>
   <div class="pm">
     <el-card class="box-card" v-for="(item,index) in focus" :key="index">
+      <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}">
         <div class="stat" v-for="(it,indexs) in mqtuuid" v-if="it.uuid==item.uuid">
           <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}"></span>
           <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}"></span>
@@ -11,6 +12,7 @@
         <div class="uuid">{{item.uuid}}</div>
         <div class="pres">加工进度</div>
         <div class="val" v-for="(it,indexs) in mqtuuid" v-if="it.uuid==item.uuid" :key="indexs" >{{it.value=="Running" ? "0%" : it.value +"%"}}</div>
+      </router-link>
     </el-card>
   </div>
 </template>
@@ -64,7 +66,7 @@ import md5 from 'js-md5'
             obj.uuid = uuid;
             obj.status = status;
             obj.value = press;
-          this.mqtuuid.push(obj)
+            this.mqtuuid.push(obj)
         }
       },
       open() {

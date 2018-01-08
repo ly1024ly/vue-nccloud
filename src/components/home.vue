@@ -92,16 +92,13 @@
       </el-menu>
     </el-aside>
     
-    <el-container>
+    <el-container :class="cla">
        <el-header style="text-align: right; font-size: 12px;position:relative;">
-        <ul>
-          <li>gg</li>
-        </ul>
-        <span>王小虎</span>
+        <div class="title">{{title}}</div>
       </el-header>
       <el-main>
       	<transition name="fade" mode="out-in">
-      		<router-view></router-view>
+      		<router-view v-on:title="getTitle"></router-view>
       	</transition>
       </el-main>
     </el-container>
@@ -129,7 +126,9 @@
   export default {
     data() {
   		return {
+        cla:'',
         is:true,
+        title:'',
         class:'el-icon-d-arrow-left',
   			objStyle:{
   				height:window.screen.height+"px"
@@ -137,7 +136,11 @@
   		}
 	  },
     mounted(){
-      console.log(window.screen.width)
+      if(this.$route.path=="/detail"){
+        this.cla = "bgcolor";
+      }else{
+        this.cla = '';
+      }
       if(window.screen.width<=768){
         this.is = false;
       }
@@ -149,7 +152,20 @@
 
       })
     },
+    watch:{
+      '$route':'styleChange'
+    },
     methods:{
+      getTitle(value){
+        this.title = value;
+      },
+      styleChange(){
+        if(this.$route.path=="/detail"){
+          this.cla = "bgcolor";
+        }else{
+          this.cla = '';
+        }
+      },
       warning(res){
         console.log(window.location.href)
         var url = window.location.href;

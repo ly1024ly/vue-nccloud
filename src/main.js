@@ -5,9 +5,11 @@ import VueRouter from 'vue-router'
 import store from './store'
 import App from './App.vue'
 import routes from './router.config'
+import echarts from 'echarts'
 const router = new VueRouter(routes)
 Vue.use(VueRouter);
 Vue.use(ElementUI)
+Vue.prototype.$echarts = echarts
 
 new Vue({
   	el: '#app',
