@@ -1,13 +1,17 @@
 require("babel-polyfill");
+var path = require("path");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+
 module.exports = {
   entry:{
     app:["babel-polyfill","./src/main.js"],
   },//入口文件
   output:{
-    path:__dirname,//输出的目录
-    filename: 'bundle.js'//输出的文件名称
+    path:path.join(__dirname,"dist"),//输出的目录
+    publicPath:'../',
+    filename:'js/[name].js',
+    chunkFilename:'js/[id].chunk.js'//输出的文件名称
   },
   devtool:"source-map",//便于调试，相当于命令行中 webpack --devtool source-map
   module: {//依赖的模块
