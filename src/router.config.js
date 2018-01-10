@@ -4,6 +4,7 @@ import Register from './components/register.vue';
 import Login from './components/login.vue';
 import Production from './components/productionMonit.vue';
 import Detail from './components/detail.vue';
+import Card from './components/card.vue';
 
 
 const routes =[
@@ -12,7 +13,14 @@ const routes =[
 		component:Home,
 		children:[
 			{path:'/warning',component:Warning,name:"消息报警"},
-			{path:'/production',component:Production,name:'生产监控'},
+			{
+				path:'/production',
+				component:Production,
+				children:[
+					{path:'/card',component:Card}
+				],
+				name:'生产监控'
+			},
 			{path:'/detail',component:Detail,name:'设备详情'}
 		]
 	},

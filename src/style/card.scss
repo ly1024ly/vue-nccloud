@@ -1,9 +1,6 @@
 $center:center;
 $color:#333;
-.pm{
-
-  display:flex;
-  flex-wrap:wrap;
+.card{
   .text {
     font-size: 14px;
   }
@@ -15,6 +12,7 @@ $color:#333;
   .box-card {
     color:#717171;
     width: 350px;
+    height:170px;
     margin:0 10px;
     div.el-card__body{
       padding:10px!important;

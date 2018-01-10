@@ -15,9 +15,10 @@ export default {
   },
   [MQTT](state,arr){
     let pass = md5("ly1024");
-
+    let ar = [];
     var productionMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
-      let ar = [_1, _2, _3, _4];
+      ar = [_1, _2, _3, _4];
+      console.log("mqtt",ar)
       state.mqtt = ar;
     });
         

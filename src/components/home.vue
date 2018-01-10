@@ -97,9 +97,10 @@
         <div class="title">{{title}}</div>
       </el-header>
       <el-main>
-      	<transition name="fade" mode="out-in">
-      		<router-view v-on:title="getTitle"></router-view>
-      	</transition>
+      	<transition-group name="fade" mode="out-in">
+          <div key="0" class='zaochen' v-show="show"><i class="el-icon-loading"></i></div>
+      		<router-view key="1" v-on:title="getTitle" v-on:success="warningSucc"></router-view>
+      	</transition-group>
       </el-main>
     </el-container>
     </el-container>
@@ -127,6 +128,7 @@
     data() {
   		return {
         cla:'',
+        show:true,
         is:true,
         title:'',
         class:'el-icon-d-arrow-left',
@@ -158,6 +160,11 @@
     methods:{
       getTitle(value){
         this.title = value;
+      },
+      warningSucc(value){
+        if(value=="success"){
+          this.show = false;
+        }
       },
       styleChange(){
         if(this.$route.path=="/detail"){

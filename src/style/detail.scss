@@ -8,4 +8,25 @@
     .el-icon-arrow-down {
       font-size: 12px;
     }
+    .card-content{
+      width:100%;
+      display:flex;
+      flex-wrap: wrap;
+      .box-card{
+        width:380px;
+        margin:15px;
+        text-align:center;
+        background:transparent;
+        .el-card__body{
+          p,div{
+           color:orange;
+          }
+        }
+        border-color:orange;
+        .el-icon-circle-plus{
+          color:orange;
+          font-size:50px;
+        }
+      }
+    }
   }

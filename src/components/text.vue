@@ -1,6 +1,6 @@
 <template>
   <div class="pm">
-    <card :mqtuuid="mqtuuid" :process="process" v-for="(item,index) in focus" :item='item' :key="index"></card>
+    <card :mqtuuid="mqtuuid" :mqtt="mqtt" v-for="(item,index) in focus" :item='item' :key="index"></card>
   </div>
 </template>
 
@@ -21,7 +21,6 @@ import card from './card.vue';
     data() {
       return {
         mqtuuid:[],
-        process:[],
         focus:[],
         mqtt:[],
         color:"green"
@@ -36,49 +35,27 @@ import card from './card.vue';
       ...mapMutations(['FOCUS_MACHINE','MQTT']),
       initData(uuid,press,status){
         if(this.mqtuuid.length!==0){
-          let flag1 = true;
-          let flag2 = true;
+          let flag = true;
           this.mqtuuid.forEach(function(val){
             if(val.uuid==uuid){
-              flag1 = false;
+              flag = false;
               val.value = press;
               val.status = status;
             }
-          });
-          this.process.forEach(function(val){
-            if(val.uuid==uuid&&status!=="WHstatus_ExecState"&&status!=="WHstatus_Error"){
-              flag2 = false;
-              val.value = press;
-              val.status = status;
-            }
-          });
-          if(flag1){
+          })
+          if(flag){
             let obj = {};
             obj.uuid = uuid;
             obj.value = press;
             obj.status = status;
-            this.mqtuuid.push(obj);
-          }
-          if(flag2&&status!=="WHstatus_ExecState"&&status!=="WHstatus_Error"){
-            let obj = {};
-            obj.uuid = uuid;
-            obj.value = press;
-            obj.status = status;
-            this.process.push(obj);
+            this.mqtuuid.push(obj)
           }
         }else if(this.mqtuuid.length==0){
-            let obj = {};
+            let obj = {}
             obj.uuid = uuid;
             obj.status = status;
             obj.value = press;
-            this.mqtuuid.push(obj);
-            if(status!=="WHstatus_ExecState"&&status!=="WHstatus_Error"){
-              let obj = {};
-              obj.uuid = uuid;
-              obj.status = status;
-              obj.value = press;
-              this.process.push(obj);
-            }
+            this.mqtuuid.push(obj)
         }
       },
       textVal(mqtt){
@@ -136,7 +113,6 @@ import card from './card.vue';
        api.getFocusMachine(obj)
         .then(res => {
           if(res.data.result=="success"){
-            this.$emit("success","success");
             let arr = [];
             console.log(res)
             res.data.values.forEach(function(value){
@@ -153,7 +129,6 @@ import card from './card.vue';
             let ar = [];
             var productionMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
               ar = [_1, _2, _3, _4];
-              _this.initData(ar[0],ar[2],ar[1]);
               console.log(ar)
               _this.mqtt = ar;
             });
@@ -166,7 +141,9 @@ import card from './card.vue';
     },
     watch:{
       mqtt:function(value){
-          console.log(value)
+        console.log("ooooo")
+        console.log(value)
+        this.initData(value[0],value[2],value[1])
       },
       mqtuuid(value){
         

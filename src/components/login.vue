@@ -32,6 +32,7 @@
   import {mapState, mapGetters,mapMutations} from 'vuex'
   import axios from 'axios'
   import md5 from 'js-md5'
+  import Cookies from 'js-cookie'
   export default {
     data() {
       var checkAge = (rule, value, callback) => {
@@ -143,13 +144,8 @@
         var str = "";
         day.setTime(day.getTime() + 7*24*60*60*1000);
         for(var key in obj){
-          str += key+"="+obj[key]+",";
+          Cookies.set(key,obj[key],{expires:7});
         }
-        str +=  "expires="+day.toGMTString(); 
-        document.cookie = str;
-        console.log(str)
-        console.log(document.cookie)
-
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();

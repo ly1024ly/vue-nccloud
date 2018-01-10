@@ -1,13 +1,13 @@
 <template>
 	<div class="warning">
-      <el-card class="box-card" v-for="(items,index) in card" :key="index">
-        <h4>{{items.alias}}</h4>
-        <div class="machine">{{items.uuid}}</div>
-        <div v-for="(item,index) in items.alarminfo" :key="index" class="text item">
-          <div class="warn">{{item.value}}</div>
-          <span class="time">{{item.timeStamp.split('T').join(' ').split('.')[0]}}</span>
-        </div>
-      </el-card>
+    <el-card class="box-card" v-for="(items,index) in card" :key="index">
+      <h4>{{items.alias}}</h4>
+      <div class="machine">{{items.uuid}}</div>
+      <div v-for="(item,index) in items.alarminfo" :key="index" class="text item">
+        <div class="warn">{{item.value}}</div>
+        <span class="time">{{item.timeStamp.split('T').join(' ').split('.')[0]}}</span>
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -31,6 +31,7 @@
         .then(res => {
             if(res.data.result=="success"){
               this.card = res.data.value;
+              this.$emit("success","success");
               console.log(res)
             }
         })

@@ -123,3 +123,4 @@ export const machineParameterList = param => {
 export const allMachineDropList = param => {
   return get(`${Interface.allMachines}?username=${param.username}&openid=${param.openid}&token=${param.token}`)
 }
+
