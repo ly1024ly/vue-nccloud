@@ -9,6 +9,17 @@
     active-text-color="#ffd04b">
     <el-menu-item index="1"><i @click="asideShow" v-bind:class="this.class
 "></i></el-menu-item>
+    <el-menu-item index="2" class="lang">
+      <el-dropdown @command="changeLang">
+        <span class="el-dropdown-link">
+          {{language}}<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item :command="cn">中文</el-dropdown-item>
+          <el-dropdown-item :command="en">英文(English)</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>     
+    </el-menu-item>
   </el-menu>
   <el-container style="height: 100%; border: 1px solid #eee">
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-show="is">
@@ -131,6 +142,9 @@
         show:true,
         is:true,
         title:'',
+        cn:'中文',
+        en:'英文(English)',
+        language:'多语言',
         class:'el-icon-d-arrow-left',
   			objStyle:{
   				height:window.screen.height+"px"
@@ -160,6 +174,9 @@
     methods:{
       getTitle(value){
         this.title = value;
+      },
+      changeLang(command){
+        this.language = command
       },
       warningSucc(value){
         if(value=="success"){

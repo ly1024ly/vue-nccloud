@@ -14,6 +14,7 @@
       flex-wrap: wrap;
       .box-card{
         width:380px;
+        height:160px;
         margin:15px;
         text-align:center;
         background:transparent;
@@ -21,8 +22,14 @@
           p,div{
            color:orange;
           }
+          .el-progress-bar__inner{
+            background-color:green;
+            .el-progress__text{
+              color:orange;
+            }
+          }
         }
-        border-color:orange;
+        border-color:rgba(225,225,225,0.7);
         .el-icon-circle-plus{
           color:orange;
           font-size:50px;

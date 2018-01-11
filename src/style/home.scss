@@ -4,6 +4,13 @@ a.router-link-exact-active{
 	text-decoration: none!important;
   color:orange;
 }
+.el-dropdown-link.el-dropdown-selfdefine{
+  color:orange;
+}  
+.el-menu-item.lang{
+  position:absolute;
+  right:20px;
+}
 .el-menu a{
 	text-decoration: none!important;
 }

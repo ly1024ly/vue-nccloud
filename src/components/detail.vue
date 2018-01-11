@@ -9,9 +9,13 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
+      <el-card class="box-card" >
+         <echart></echart> 
+      </el-card>
       <el-card class="box-card" v-for="(item,index) in machineParameterList" :key="index" :class="item.key">
           <p>{{item.value}}</p>
-          <div v-text:msg="innerMsg(item.key)">{{msg}}</div>
+          <el-progress v-show="item.value=='加工进度'" :text-inside="true" :stroke-width="16" v-for="(it,index) in innerText" v-if="it.status=='WHstatus_HadCompletedPercent'" :percentage="Number(it.value)" :key="index"></el-progress>
+          <div v-show="item.value!=='加工进度'" v-text:msg="innerMsg(item.key)">{{msg}}</div>
       </el-card>
       <el-card class="box-card" @click="open4">
         <el-button type="text" @click="open4"><i class="el-icon-circle-plus" ></i></el-button>
@@ -29,6 +33,7 @@ import * as api from '../api/server.js';
 import { mapMutations,mapState} from 'vuex';
 import NcMqttClient from '../mqtt/mqttEchart.js';
 import md5 from 'js-md5';
+import echart from './echart.vue';
 
   export default{
     data(){
@@ -38,9 +43,15 @@ import md5 from 'js-md5';
         innerText:[],
         machineParameterList:[],
         msg:'',
+        proData:0,
+        process:false,
+        WHstatus_FeedVData:[],
         uuid:this.$route.query.uuid,
         mqtts:[]
       }
+    },
+    components:{
+      echart
     },
     computed:{
     },
@@ -60,6 +71,15 @@ import md5 from 'js-md5';
         console.log(result)
         return result
       },
+      feedVSstyle(msg){
+        var t = msg * 60 + " ";
+        var t1 = t.indexOf('.');
+        if(t1 == -1) {
+          t1 = t.length;
+        }
+        var a = t.substr(0, t1);
+        return a;
+      },
       rule(param){
         let name = param.status;
         let value = param.value;
@@ -70,9 +90,14 @@ import md5 from 'js-md5';
         } else if(name == "WHstatus_ControllerMode") {
           val = value;
         } else if(name == "WHstatus_FeedV") {
-          val =  "  mm/min";
+          let ts = time.substr(0, 27);
+          if(this.WHstatus_FeedVData.length > 1800){
+            this.WHstatus_FeedVData = this.WHstatus_FeedVData.slice(500)
+          }
+          
+          val =  value + "  mm/min";
         } else if(name == "WHstatus_SpindleFeedrate") {
-          val = time + " %";
+          val = value + " %";
         } else if(name == "WHstatus_SpindleSpeed") {
           val = value + "  rpm";
         } else if(name == "WHstatus_FeedRate") {
@@ -161,6 +186,17 @@ import md5 from 'js-md5';
           "item": '+'
         }]);
       },
+      getMachineData(obj){
+        api.machineParameterList(obj)
+          .then(res => {
+            //获取设备参数
+            if(res.data.result=="success"){
+              console.log(res)
+              this.machineParameterList = res.data.value.params;
+            }
+          });
+        this.detailMqtt(obj.uuid)
+      },
       open4() {
         const h = this.$createElement;
         this.$msgbox({
@@ -196,13 +232,12 @@ import md5 from 'js-md5';
     },
     mounted(){
       this.$emit("success","success");
-      console.log(this.uuid);
-      let uuid = this.uuid;
-      let obj = {};
+      this.uuid = this.$route.query.uuid;
       var _this = this;
-      this.handleCommand(this.$route.query.alias)
+      this.handleCommand(this.$route.query.alias);
+      let obj = {};
       obj.username = "ly1024";
-      obj.uuid = uuid;
+      obj.uuid = this.$route.query.uuid;
       obj.openid = "oh9Djvup_15urtYmlsZIF-5SITeo";
       obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4";
       console.log(obj)
@@ -213,21 +248,21 @@ import md5 from 'js-md5';
             this.machinelist = res.data.values;
           }
         });
-      api.machineParameterList(obj)
-        .then(res => {
-          console.log(res)
-          //获取设备参数
-          if(res.data.result=="success"){
-            this.machineParameterList = res.data.value.params;
-          }
-        });
-     
-        this.detailMqtt(uuid)
+      this.getMachineData(obj);
+      this.$emit("title",this.$route.query.alias)
     },
     watch:{
       mqtts:function(ar){
         
  
+      },
+      uuid:function(val){
+        let obj = {};
+        obj.username = "ly1024";
+        obj.uuid = val;
+        obj.openid = "oh9Djvup_15urtYmlsZIF-5SITeo";
+        obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4";
+        this.getMachineData(obj);
       },
       innerText(val){
         console.log(val)
