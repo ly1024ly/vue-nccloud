@@ -2,16 +2,19 @@
   <div class="card">
     <el-card class="box-card" >
       <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}">
-        <div class="stat" v-for="(it,indexs) in mqtuuid" v-if="it.uuid==item.uuid">
-          <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}"></span>
-          <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}"></span>
-          <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}"></span>
-          <span v-else="it.status=='WHstatus_ExecState'" :style="{background:'gray'}"></span>
+        <div class="stat" v-for="(it,indexs) in arr" :key="indexs" >
+          <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}" v-show="show"></span>
+          <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}" v-show="show"></span>
+          <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}" v-show="show"></span>
+          <span v-else="it.status=='WHstatus_ExecState'" :style="{background:'gray'}" v-show="show"></span>
+          <div >{{item.alias}}</div>
         </div>
-        <p>{{item.alias}}</p>
-        <div class="uuid">{{item.uuid}}</div>
-        <div class="pres">加工进度</div>
-        <div class="val" v-for="(it,indexs) in process" v-if="it.uuid==item.uuid" :key="indexs" v-text:msg="textVal(it)">{{msg}}</div>
+        <div v-show="show">
+          <p>{{item.alias}}</p>
+          <div class="uuid" >{{item.uuid}}</div>
+          <div class="pres" >加工进度</div>
+          <div class="val" v-for="(it,indexs) in process" v-if="it.uuid==item.uuid" :key="indexs" v-text:msg="textVal(it)">{{msg}}</div>
+        </div>
       </router-link>
     </el-card>
   </div>
@@ -23,19 +26,44 @@
 
 <script type="text/javascript">
   export default{
-    props:['mqtuuid','item',"process"],
+    props:['mqtuuid','item',"process","allMqttStatus"],
     data(){
       return {
-        msg:""
+        msg:"",
+        arr:[],
+        show:true
       }
     },
     mounted(){
         console.log("********************");
-        console.log(this.mqtuuid)
+        console.log(this.allMqttStatus,this.mqtuuid);
+        console.log(this.item)
+        if(this.allMqttStatus){
+          this.arr = this.allMqttStatus;
+          this.show = false;
+        }else if(this.mqtuuid){
+          this.arr = this.mqtuuid;
+          this.show = true;
+        }
+    },
+    computed:{
+      filterArr:function(){
+        this.arr.filter(t => {
+          if(t.status = this.item.status){
+            return true
+          }
+        })
+      }
     },
     methods:{
+      showCondition(it,item){
+        if(this.mqtuuid){
+          return it.uuid == item.uuid
+        }else if(this.allMqttStatus){
+          return it.status = item.status;
+        }
+      },
       textVal(mqtt){
-        console.log("********************");
         console.log(this.process)
         let status = mqtt.status;
         let val = '';
@@ -66,6 +94,11 @@
         console.log(val)
         return val
        } 
+    },
+    watch:{
+      arr:function(value){
+        console.log(value)
+      }
     }
   }
 </script>

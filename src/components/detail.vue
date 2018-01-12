@@ -9,14 +9,7 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
-      <el-card class="box-card" >
-         <echart></echart> 
-      </el-card>
-      <el-card class="box-card" v-for="(item,index) in machineParameterList" :key="index" :class="item.key">
-          <p>{{item.value}}</p>
-          <el-progress v-show="item.value=='加工进度'" :text-inside="true" :stroke-width="16" v-for="(it,index) in innerText" v-if="it.status=='WHstatus_HadCompletedPercent'" :percentage="Number(it.value)" :key="index"></el-progress>
-          <div v-show="item.value!=='加工进度'" v-text:msg="innerMsg(item.key)">{{msg}}</div>
-      </el-card>
+      <card v-for="(item,index) in innerText" :key="index" :item="item"  :allMqttStatus="allMqttStatus"></card>
       <el-card class="box-card" @click="open4">
         <el-button type="text" @click="open4"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
@@ -34,6 +27,7 @@ import { mapMutations,mapState} from 'vuex';
 import NcMqttClient from '../mqtt/mqttEchart.js';
 import md5 from 'js-md5';
 import echart from './echart.vue';
+import card from './card.vue';
 
   export default{
     data(){
@@ -52,7 +46,8 @@ import echart from './echart.vue';
       }
     },
     components:{
-      echart
+      echart,
+      card
     },
     computed:{
     },
@@ -182,7 +177,8 @@ import echart from './echart.vue';
                     let obj = {
                       status:ar[1],
                       value:ar[2],
-                      time:ar[3]
+                      time:ar[3],
+                      alias:_this.machineParameterList[i].value
                     }
                     _this.innerText.push(obj)
                   }else{
@@ -195,6 +191,7 @@ import echart from './echart.vue';
                         newObj.status = ar[1];
                         newObj.value = ar[2];
                         newObj.time = ar[3];
+                        newObj.alias = _this.machineParameterList[i].value;
                         newArr.push(newObj)
                       }else{
                         newArr.push(val)
@@ -204,7 +201,8 @@ import echart from './echart.vue';
                         let obj = {
                           status:ar[1],
                           value:ar[2],
-                          time:ar[3]
+                          time:ar[3],
+                          alias:_this.machineParameterList[i].value
                         }
                         _this.innerText.push(obj)
                     }else{
@@ -294,7 +292,7 @@ import echart from './echart.vue';
  
       },
       allMqttStatus:function(value){
-        _this.rule(value)
+        
       },
       uuid:function(val){
         let obj = {};
@@ -305,7 +303,7 @@ import echart from './echart.vue';
         this.getMachineData(obj);
       },
       innerText(val){
-        console.log(val)
+        
       }
     }
   }
