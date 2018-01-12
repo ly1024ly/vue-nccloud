@@ -45,6 +45,7 @@ import echart from './echart.vue';
         msg:'',
         proData:0,
         process:false,
+        allMqttStatus:[],
         WHstatus_FeedVData:[],
         uuid:this.$route.query.uuid,
         mqtts:[]
@@ -134,6 +135,41 @@ import echart from './echart.vue';
         } else if(name == 'WHstatus_Error') {}
         return val
       },
+      forceData(ar,data){
+        if(data.length==0){
+          let obj = {
+            status:ar[1],
+            value:ar[2],
+            time:ar[3]
+          }
+          data.push(obj)
+        }else{
+          let flag = true;
+          let newArr = [];
+          data.forEach(function(val){
+            var newObj = {};
+            if(val.status==ar[1]){
+              flag = false;
+              newObj.status = ar[1];
+              newObj.value = ar[2];
+              newObj.time = ar[3];
+              newArr.push(newObj)
+            }else{
+              newArr.push(val)
+            }
+          });
+          if(flag){
+              let obj = {
+                status:ar[1],
+                value:ar[2],
+                time:ar[3]
+              }
+              data.push(obj)
+          }else{
+              data = newArr;
+          }
+        }       
+      },
       detailMqtt(uuid){
         let pass = md5("ly1024");
         let ar = [];
@@ -174,9 +210,10 @@ import echart from './echart.vue';
                     }else{
                         _this.innerText = newArr;
                     }
-                  }
+                  }       
                 }
               }
+            _this.forceData(ar,_this.allMqttStatus);
               console.log(ar)
             _this.mqtts = ar;
         })
@@ -255,6 +292,9 @@ import echart from './echart.vue';
       mqtts:function(ar){
         
  
+      },
+      allMqttStatus:function(value){
+        _this.rule(value)
       },
       uuid:function(val){
         let obj = {};
