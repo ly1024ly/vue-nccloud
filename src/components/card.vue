@@ -2,18 +2,22 @@
   <div class="card">
     <el-card class="box-card" >
       <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}">
-        <div class="stat" v-for="(it,indexs) in arr" :key="indexs" >
+        <div class="stat" v-for="(it,indexs) in arr" :key="indexs" v-if="filterArr">
           <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}" v-show="show"></span>
           <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}" v-show="show"></span>
           <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}" v-show="show"></span>
           <span v-else="it.status=='WHstatus_ExecState'" :style="{background:'gray'}" v-show="show"></span>
-          <div >{{item.alias}}</div>
         </div>
         <div v-show="show">
           <p>{{item.alias}}</p>
           <div class="uuid" >{{item.uuid}}</div>
-          <div class="pres" >加工进度</div>
+          <div class="pres" v-show="show">加工进度</div>
           <div class="val" v-for="(it,indexs) in process" v-if="it.uuid==item.uuid" :key="indexs" v-text:msg="textVal(it)">{{msg}}</div>
+        </div>
+        <div v-show="!show" >
+          <div class="uuid" >{{item.alias}}</div>
+          <div class="val">{{textVal(item)}}</div>
+          
         </div>
       </router-link>
     </el-card>
@@ -49,7 +53,7 @@
     computed:{
       filterArr:function(){
         this.arr.filter(t => {
-          if(t.status = this.item.status){
+          if(t.status == this.item.status){
             return true
           }
         })
@@ -63,35 +67,55 @@
           return it.status = item.status;
         }
       },
-      textVal(mqtt){
-        console.log(this.process)
-        let status = mqtt.status;
-        let val = '';
-        if(status == "WHstatus_FeedV") {
-            //$("#" + machineInfo.uuid + " .WHstatus_FeedV").html(feedVSstyle(machineInfo.value) + "  mm/min")
-        }else if(status == "WHstatus_programName") {
-            if(mqtt.value == '') {
-              val = '****';
-            } else {
-              //截取加工文件
-              var cncname = mqtt.value.substr(mqtt.value.lastIndexOf('\\') + 1);
-              val = cncname;
-            }
-        } else if(status == "WHstatus_SpindleFeedrate") {
-          //var time = mofifySpindleFeedrateStyle(machineInfo.value);
-          val = mqtt.value + " %";
-        } else if(status == "WHstatus_TotalCompletedCount") {
-          val = mqtt.value + " 件";
-        } else if(status == "WHstatus_SpindleSpeed") {
-          val = mqtt.value + "  rpm";
-        } else if(status == "WHstatus_HadCompletedPercent") {
-          val = mqtt.value + "  %";
-        } else if(status == "WHstatus_FeedRate") {
-          val = mqtt.value + "  %";
-        } else if(status == "WHstatus_ControllerMode") {
-          val = mqtt.value;
-        }
-        console.log(val)
+      textVal(param){
+        let name = param.status;
+        let value = param.value;
+        let time = param.time;
+        let val;
+        if(name == "WHstatus_TotalCompletedCount") {
+          val = value + " 件";
+        } else if(name == "WHstatus_ControllerMode") {
+          val = value;
+        } else if(name == "WHstatus_FeedV") {
+          let ts = time.substr(0, 27);
+          
+          val =  value + "  mm/min";
+        } else if(name == "WHstatus_SpindleFeedrate") {
+          val = value + " %";
+        } else if(name == "WHstatus_SpindleSpeed") {
+          val = value + "  rpm";
+        } else if(name == "WHstatus_FeedRate") {
+          val = value + "  %";
+        } else if(name == "WHstatus_HadCompletedPercent") {
+          val = value + "  %";
+        } else if(name == "WHstatus_programName") {
+          if(value == '') {
+            val = '****';
+          } else {
+            //截取加工文件
+            var cncname = value.substr(value.lastIndexOf('\\') + 1);
+            val = cncname;
+          }
+        } else if(name == "WHstatus_ExecState") {
+          
+          if(value == "Running") {
+            
+          } else if(value == "Idle") {
+           
+          } else if(value == "Estop") {
+           
+          } else {
+            
+          }
+        } else if(name == "WHstatus_Timeline") {
+         
+        } else if(name == 'WHstatus_Efficiency') {
+          //echarts
+          var todayTimeSum = 0;
+          if(value !== null &&value) {
+            
+          }
+        } else if(name == 'WHstatus_Error') {}
         return val
        } 
     },
