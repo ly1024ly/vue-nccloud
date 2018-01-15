@@ -28,6 +28,7 @@ import card from './card.vue';
       }
     },
     computed:{
+      
     },
     components:{
        card
@@ -154,7 +155,6 @@ import card from './card.vue';
             var productionMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
               ar = [_1, _2, _3, _4];
               _this.initData(ar[0],ar[2],ar[1]);
-              console.log(ar)
               _this.mqtt = ar;
             });
                 

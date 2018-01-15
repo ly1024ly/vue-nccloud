@@ -9,7 +9,8 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
-      <card v-for="(item,index) in innerText" :key="index" :item="item"  :allMqttStatus="allMqttStatus"></card>
+      <card v-for="(item,index) in allMqttStatus" :key="index" :WHstatus_ExecState="WHstatus" v-if="WHstatusData(item)" :item="item"></card>
+      <card v-for="(item,index) in innerText" :key="index+allMqttStatus.length" :item="item"  :allMqttStatus="allMqttStatus"></card>
       <el-card class="box-card" @click="open4">
         <el-button type="text" @click="open4"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
@@ -42,7 +43,8 @@ import card from './card.vue';
         allMqttStatus:[],
         WHstatus_FeedVData:[],
         uuid:this.$route.query.uuid,
-        mqtts:[]
+        mqtts:[],
+        WHstatus:{}
       }
     },
     components:{
@@ -50,11 +52,21 @@ import card from './card.vue';
       card
     },
     computed:{
+
     },
     methods:{
+      ...mapMutations(['CHANGEALIAS']),
       handleCommand(command) {
+
         this.uuid = command.uuid;
+        
         this.$emit("title",command.alias)
+      },
+      WHstatusData:function(t){
+        if(t.status == "WHstatus_ExecState"){
+          this.WHstatus = t;
+          return true
+        }
       },
       innerMsg(key){
         let name = this.innerText;  
@@ -133,6 +145,7 @@ import card from './card.vue';
       forceData(ar,data){
         if(data.length==0){
           let obj = {
+            uuid:ar[0],
             status:ar[1],
             value:ar[2],
             time:ar[3]
@@ -145,6 +158,7 @@ import card from './card.vue';
             var newObj = {};
             if(val.status==ar[1]){
               flag = false;
+              newObj.uuid = ar[0];
               newObj.status = ar[1];
               newObj.value = ar[2];
               newObj.time = ar[3];
@@ -155,6 +169,7 @@ import card from './card.vue';
           });
           if(flag){
               let obj = {
+                uuid:ar[0],
                 status:ar[1],
                 value:ar[2],
                 time:ar[3]
@@ -210,9 +225,44 @@ import card from './card.vue';
                     }
                   }       
                 }
-              }
-            _this.forceData(ar,_this.allMqttStatus);
-              console.log(ar)
+              };
+              //生成allMqttStatus数组
+              if(_this.allMqttStatus.length==0){
+                let obj = {
+                  uuid:ar[0],
+                  status:ar[1],
+                  value:ar[2],
+                  time:ar[3]
+                }
+                _this.allMqttStatus.push(obj)
+              }else{
+                let flag = true;
+                let newArr = [];
+                _this.allMqttStatus.forEach(function(val){
+                  var newObj = {};
+                  if(val.status==ar[1]){
+                    flag = false;
+                    newObj.uuid = ar[0];
+                    newObj.status = ar[1];
+                    newObj.value = ar[2];
+                    newObj.time = ar[3];
+                    newArr.push(newObj)
+                  }else{
+                    newArr.push(val)
+                  }
+                });
+                if(flag){
+                    let obj = {
+                      uuid:ar[0],
+                      status:ar[1],
+                      value:ar[2],
+                      time:ar[3]
+                    }
+                    _this.allMqttStatus.push(obj)
+                }else{
+                    _this.allMqttStatus = newArr;
+                }
+              }       
             _this.mqtts = ar;
         })
         detailMqtt.connect([{
@@ -222,6 +272,7 @@ import card from './card.vue';
         }]);
       },
       getMachineData(obj){
+        console.log("kkkk")
         api.machineParameterList(obj)
           .then(res => {
             //获取设备参数
@@ -292,6 +343,9 @@ import card from './card.vue';
  
       },
       allMqttStatus:function(value){
+        console.log(value)
+      },
+      WHstatus:function(value){
         
       },
       uuid:function(val){

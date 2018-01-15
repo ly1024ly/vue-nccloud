@@ -1,7 +1,8 @@
 import {
   USER_INFO,
   FOCUS_MACHINE,
-  MQTT
+  MQTT,
+  CHANGEALIAS
 } from './mutation-types.js'
 import NcMqttClient from '../mqtt/mqttEchart.js';
 import md5 from 'js-md5'
@@ -23,5 +24,8 @@ export default {
     });
         
     productionMqtt.connect(arr)
+  },
+  [CHANGEALIAS](state,arr){
+    state.aliasMqtt = arr;
   }
 }

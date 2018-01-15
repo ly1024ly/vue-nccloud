@@ -10,7 +10,8 @@ const state = {
   user:null,
   focMachine:null,
   mqtt:null,
-  progress:''
+  progress:'',
+  aliasMqtt:[]
 } 
 
 export default new Vuex.Store({

@@ -1,12 +1,14 @@
 <template>
-  <div class="card">
+  <div class="card" >
     <el-card class="box-card" >
       <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}">
-        <div class="stat" v-for="(it,indexs) in arr" :key="indexs" v-if="filterArr">
-          <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}" v-show="show"></span>
-          <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}" v-show="show"></span>
-          <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}" v-show="show"></span>
-          <span v-else="it.status=='WHstatus_ExecState'" :style="{background:'gray'}" v-show="show"></span>
+        <div class="stat" v-for="(it,indexs) in arr" :key="indexs">
+          <div v-if="mqtuuid&&it.uuid==item.uuid">
+            <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}" v-show="show"></span>
+            <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}" v-show="show"></span>
+            <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}" v-show="show"></span>
+            <span v-else="it.status=='WHstatus_ExecState'" :style="{background:'gray'}" v-show="show"></span>
+          </div>
         </div>
         <div v-show="show">
           <p>{{item.alias}}</p>
@@ -19,6 +21,10 @@
           <div class="val">{{textVal(item)}}</div>
           
         </div>
+        <div v-if="ExecState" >
+          <div class="state" v-bind:style="{backgroundColor:bgcolor}">{{state}}</div>
+          <div class="val">开始时间:{{item.time}}</div>
+        </div>
       </router-link>
     </el-card>
   </div>
@@ -29,34 +35,59 @@
 </style>
 
 <script type="text/javascript">
+import {mapState} from 'vuex'
   export default{
-    props:['mqtuuid','item',"process","allMqttStatus"],
+    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState"],
     data(){
       return {
         msg:"",
         arr:[],
-        show:true
+        show:true,
+        bgcolor:'',
+        state:'',
+        runData:[],
+        ExecStateState:this.WHstatus_ExecState
       }
     },
     mounted(){
-        console.log("********************");
-        console.log(this.allMqttStatus,this.mqtuuid);
-        console.log(this.item)
         if(this.allMqttStatus){
           this.arr = this.allMqttStatus;
           this.show = false;
         }else if(this.mqtuuid){
           this.arr = this.mqtuuid;
           this.show = true;
+        }else{
+          this.show = false;
         }
     },
     computed:{
+      ...mapState(['aliasMqtt']),
       filterArr:function(){
         this.arr.filter(t => {
           if(t.status == this.item.status){
             return true
           }
         })
+      },
+      ExecState:function(){
+        console.log(this.aliasMqtt)
+        if(this.WHstatus_ExecState){
+          
+          if(this.WHstatus_ExecState.value=="Running"){
+            this.state = "运行";
+            this.bgcolor = 'green'
+          }else if(this.WHstatus_ExecState.value == "Idle"){
+            this.state = "空闲";
+            this.bgcolor = "yellow"
+          }else if(this.WHstatus_ExecState.value == "Estop"){
+            this.state = "紧停";
+            this.bgcolor = "red";
+          }else{
+            this.state = "离线";
+            this.bgcolor = "gray";
+          }
+          return true
+        }
       }
     },
     methods:{
@@ -121,7 +152,10 @@
     },
     watch:{
       arr:function(value){
-        console.log(value)
+        
+      },
+      'WHstatus_ExecState.value':function(newValue, oldValue){
+        console.log(newValue)
       }
     }
   }
