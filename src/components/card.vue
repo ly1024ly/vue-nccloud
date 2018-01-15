@@ -70,8 +70,8 @@ import {mapState} from 'vuex'
         })
       },
       ExecState:function(){
-        console.log(this.aliasMqtt)
-        if(this.WHstatus_ExecState){
+        console.log(this.WHstatus_ExecState)
+        if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status=="WHstatus_ExecState"){
           
           if(this.WHstatus_ExecState.value=="Running"){
             this.state = "运行";
@@ -86,6 +86,9 @@ import {mapState} from 'vuex'
             this.state = "离线";
             this.bgcolor = "gray";
           }
+          return true
+        }else if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status == "WHstatus_FeedV"){
+          this.state = "WHstatus_FeedV"
           return true
         }
       }

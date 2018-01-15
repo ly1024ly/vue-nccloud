@@ -9,7 +9,7 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
-      <card v-for="(item,index) in allMqttStatus" :key="index" :WHstatus_ExecState="WHstatus" v-if="WHstatusData(item)" :item="item"></card>
+      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item"></card>
       <card v-for="(item,index) in innerText" :key="index+allMqttStatus.length" :item="item"  :allMqttStatus="allMqttStatus"></card>
       <el-card class="box-card" @click="open4">
         <el-button type="text" @click="open4"><i class="el-icon-circle-plus" ></i></el-button>
@@ -44,7 +44,8 @@ import card from './card.vue';
         WHstatus_FeedVData:[],
         uuid:this.$route.query.uuid,
         mqtts:[],
-        WHstatus:{}
+        WHstatus:{},
+        echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV"]
       }
     },
     components:{
@@ -52,7 +53,17 @@ import card from './card.vue';
       card
     },
     computed:{
-
+      getEcharts:function(){
+        let arr = [];
+        this.allMqttStatus.filter(t => {
+          this.echartsMqtt.forEach(function(val){
+            if(val==t.status){
+              arr.push(t)
+            }
+          })
+        });
+        return arr
+      }
     },
     methods:{
       ...mapMutations(['CHANGEALIAS']),
