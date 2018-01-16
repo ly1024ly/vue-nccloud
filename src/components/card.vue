@@ -26,10 +26,10 @@
           <div v-show="!echart" class="val">开始时间:{{item.time}}</div>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency'? true : false">
-          <echart :option="setOptions(item)" :key="0" ></echart>
+          <echart :option="setOptions(item)"  :id="item.status"></echart>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency_yester'? true : false">
-         <echart :option="setOptions(item)" :key="1" ></echart>
+         <echart :option="setOptions(item)"  :id="item.status"></echart>
         </div>
         <div>
         </div>
@@ -177,7 +177,6 @@ import echart from './echart.vue'
         }
       },
       setOptions(item){
-      console.log(item)
         let obj = {};
         if(item.status=="WHstatus_Efficiency"){
           obj.title = "今日工时分布";
@@ -207,7 +206,6 @@ import echart from './echart.vue'
           }
         }
         obj.data = arr;
-        console.log(obj)
         return obj
       },
       textVal(param){

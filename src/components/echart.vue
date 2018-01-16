@@ -1,6 +1,6 @@
 <template>
 
-  <div id="main"></div>
+  <div :id="id" class="main"></div>
 </template>
 
 <style lang="scss" scoped>
@@ -10,22 +10,28 @@
 <script type="text/javascript">
   import echarts from 'echarts'
   export default {
-    props:['option'],
+    props:['option',"id"],
     data() {
       return {
         chart:null,
         legend:[],
         data:this.option,
-        num:[]
+        num:[],
+        rid:this.id
       }
     },
     methods:{
-      drawGraph() { 
-         var that = this;
-         this.chart = echarts.init(document.getElementById("main"));
-         this.chart.setOption({
+      drawGraph(id,data) { 
+        var that = this;
+        this.chart = echarts.init(document.getElementById(id));
+        let legend = [];
+        console.log(data)
+        for(var i=0;i<data.data.length;i++){
+          legend.push(data.data[i].name)
+        }
+        this.chart.setOption({
             title : {
-                text: this.data.title,
+                text: data.title,
                 x:'22%'
             },
             tooltip : {
@@ -35,11 +41,11 @@
             legend: {
                 orient: 'vertical',
                 left: 'right',
-                data: this.legend,
+                data: legend,
                 formatter:function(name){
-                  for(var i=0;i<that.data.data.length;i++){
-                    if(name == that.data.data[i].name){
-                      return that.data.data[i].name + " "+ that.data.data[i].value;
+                  for(var i=0;i<data.data.length;i++){
+                    if(name == data.data[i].name){
+                      return data.data[i].name + " "+ data.data[i].value;
                     }
                   }
                 }
@@ -50,7 +56,7 @@
                     type: 'pie',
                     radius : '55%',
                     center: ['40%', '60%'],
-                    data:this.data.data,
+                    data:data.data,
                     labelLine:{
                         normal:{
                           show:false
@@ -75,18 +81,20 @@
     },
     mounted(){
       this.num.push(this.option)
+      console.log(this.option,this.id)
+      this.data = this.option;
       if(this.data&&this.data.data){
         for(var i=0;i<this.data.data.length;i++){
           this.legend.push(this.data.data[i].name)
         }
       }
-      this.drawGraph();
+      this.drawGraph(this.id,this.option);
     },
     watch:{
       option:function(value){
         this.data = value;
         
-        this.drawGraph();
+        this.drawGraph(this.id,value);
       },
       num:function(val){
         
