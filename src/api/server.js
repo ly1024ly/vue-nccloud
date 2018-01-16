@@ -124,3 +124,7 @@ export const allMachineDropList = param => {
   return get(`${Interface.allMachines}?username=${param.username}&openid=${param.openid}&token=${param.token}`)
 }
 
+export const yesterdayEfficiency = param => {
+  let times = new Date(new Date().getTime() + 8 * 3600 * 1000 - 24 * 3600 * 1000).toISOString().substr(0, 10);
+  return get(`${Interface.efficiency}?uuid=${param.uuid}&timestamp=${times}&token=${param.token}`)
+}

@@ -45,6 +45,7 @@ import card from './card.vue';
         uuid:this.$route.query.uuid,
         mqtts:[],
         WHstatus:{},
+        yester:{},
         echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency"]
       }
     },
@@ -54,8 +55,8 @@ import card from './card.vue';
     },
     computed:{
       getEcharts:function(){
-      console.log("^^^^^^^^^^^getEchart^^^^^^^^");
         let arr = [];
+        arr.push(this.yester);
         this.allMqttStatus.filter(t => {
           this.echartsMqtt.forEach(function(val){
             if(val==t.status){
@@ -63,7 +64,7 @@ import card from './card.vue';
             }
           })
         });
-        console.log(arr)
+        
         return arr
       }
     },
@@ -72,7 +73,7 @@ import card from './card.vue';
       handleCommand(command) {
 
         this.uuid = command.uuid;
-        
+        this.yesterEffi();
         this.$emit("title",command.alias)
       },
       WHstatusData:function(t){
@@ -153,6 +154,25 @@ import card from './card.vue';
           }
         } else if(name == 'WHstatus_Error') {}
         return val
+      },
+      yesterEffi(){
+        let obj = {
+          uuid:this.uuid ? this.uuid : this.$route.query.uuid,
+          token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4"
+        };
+        api.yesterdayEfficiency(obj)
+          .then(res =>{
+            if(res.data.result=="success"&&res.data.value!==null){
+              let o = {
+                uuid:res.data.value.uuid,
+                status:"WHstatus_Efficiency_yester",
+                value:res.data.value.duration
+              }
+              this.yester = o;
+            }else{
+              this.yester = {};
+            }
+          })
       },
       forceData(ar,data){
         if(data.length==0){
@@ -343,7 +363,8 @@ import card from './card.vue';
           }
         });
       this.getMachineData(obj);
-      this.$emit("title",this.$route.query.alias)
+      this.$emit("title",this.$route.query.alias);
+      this.yesterEffi();
     },
     watch:{
       mqtts:function(ar){
@@ -362,6 +383,7 @@ import card from './card.vue';
         obj.openid = "oh9Djvup_15urtYmlsZIF-5SITeo";
         obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4";
         this.getMachineData(obj);
+        this.uuid = val;
       },
       innerText(val){
         

@@ -26,7 +26,10 @@
           <div v-show="!echart" class="val">开始时间:{{item.time}}</div>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency'? true : false">
-          <echart :option="setOption"></echart>
+          <echart :option="setOptions(item)" :key="0" ></echart>
+        </div>
+        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency_yester'? true : false">
+         <echart :option="setOptions(item)" :key="1" ></echart>
         </div>
         <div>
         </div>
@@ -79,13 +82,44 @@ import echart from './echart.vue'
           }
         })
       },
-      setOption(){
+      yesOption(){
         let obj = {};
-        obj.title = "今日工时分布";
+        obj.title = "昨日工时分布";
         let arr = [];
         if(this.item.value!==null&&this.item.value){
           for(var i = 0;i<this.item.value.length;i++){
-          console.log(this.item.value)
+            let o = {};
+            if(this.item.value[i].status == "Running"){
+              o.name = "加工";
+              o.value = this.item.value[i].time;
+            }else if(this.item.value[i].status == "Estop"){
+              o.name = "紧停";
+              o.value = this.item.value[i].time;
+            }else if(this.item.value[i].status == "Idle"){
+              o.name = "空闲";
+              o.value = this.item.value[i].time;
+            }else if(this.item.value[i].status == "Offline"){
+              o.name = "离线";
+              o.value = this.item.value[i].time;
+            }
+            arr.push(o)
+          }
+        }
+        obj.data = arr;
+        return obj  
+      },
+      setOption(){
+        let obj = {};
+        if(this.item.status=="WHstatus_Efficiency"){
+          obj.title = "今日工时分布";
+          obj.status = this.item.status;
+        }else if(this.item.status=="WHstatus_Efficiency_yester"){
+          obj.title = "昨日工时分布";
+          obj.status = this.item.status;
+        }
+        let arr = [];
+        if(this.item.value!==null&&this.item.value){
+          for(var i = 0;i<this.item.value.length;i++){
             let o = {};
             if(this.item.value[i].status == "Running"){
               o.name = "加工";
@@ -141,6 +175,40 @@ import echart from './echart.vue'
         }else if(this.allMqttStatus){
           return it.status = item.status;
         }
+      },
+      setOptions(item){
+      console.log(item)
+        let obj = {};
+        if(item.status=="WHstatus_Efficiency"){
+          obj.title = "今日工时分布";
+          obj.status = this.item.status;
+        }else if(item.status=="WHstatus_Efficiency_yester"){
+          obj.title = "昨日工时分布";
+          obj.status = this.item.status;
+        }
+        let arr = [];
+        if(item.value!==null&&item.value){
+          for(var i = 0;i<item.value.length;i++){
+            let o = {};
+            if(item.value[i].status == "Running"){
+              o.name = "加工";
+              o.value = item.value[i].time;
+            }else if(item.value[i].status == "Estop"){
+              o.name = "紧停";
+              o.value = item.value[i].time;
+            }else if(item.value[i].status == "Idle"){
+              o.name = "空闲";
+              o.value = item.value[i].time;
+            }else if(item.value[i].status == "Offline"){
+              o.name = "离线";
+              o.value = item.value[i].time;
+            }
+            arr.push(o)
+          }
+        }
+        obj.data = arr;
+        console.log(obj)
+        return obj
       },
       textVal(param){
         let name = param.status;
@@ -199,7 +267,6 @@ import echart from './echart.vue'
         
       },
       WHstatus_ExecState:function(newValue){
-        
       }
     }
   }

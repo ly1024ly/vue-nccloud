@@ -1,4 +1,5 @@
 <template>
+
   <div id="main"></div>
 </template>
 
@@ -14,7 +15,8 @@
       return {
         chart:null,
         legend:[],
-        data:this.option
+        data:this.option,
+        num:[]
       }
     },
     methods:{
@@ -24,7 +26,7 @@
          this.chart.setOption({
             title : {
                 text: this.data.title,
-                x:'center'
+                x:'22%'
             },
             tooltip : {
                 trigger: 'item',
@@ -44,10 +46,10 @@
             },
             series : [
                 {
-                    name: '访问来源',
+                    name: '加工效率分析',
                     type: 'pie',
                     radius : '55%',
-                    center: ['50%', '60%'],
+                    center: ['40%', '60%'],
                     data:this.data.data,
                     labelLine:{
                         normal:{
@@ -72,7 +74,8 @@
       } 
     },
     mounted(){
-      if(this.data.data){
+      this.num.push(this.option)
+      if(this.data&&this.data.data){
         for(var i=0;i<this.data.data.length;i++){
           this.legend.push(this.data.data[i].name)
         }
@@ -82,7 +85,11 @@
     watch:{
       option:function(value){
         this.data = value;
+        
         this.drawGraph();
+      },
+      num:function(val){
+        
       }
     }
   }
