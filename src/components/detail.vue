@@ -45,7 +45,7 @@ import card from './card.vue';
         uuid:this.$route.query.uuid,
         mqtts:[],
         WHstatus:{},
-        echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV"]
+        echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency"]
       }
     },
     components:{
@@ -54,6 +54,7 @@ import card from './card.vue';
     },
     computed:{
       getEcharts:function(){
+      console.log("^^^^^^^^^^^getEchart^^^^^^^^");
         let arr = [];
         this.allMqttStatus.filter(t => {
           this.echartsMqtt.forEach(function(val){
@@ -62,6 +63,7 @@ import card from './card.vue';
             }
           })
         });
+        console.log(arr)
         return arr
       }
     },
@@ -87,7 +89,6 @@ import card from './card.vue';
             result = this.rule(name[i])
           }
         }
-        console.log(result)
         return result
       },
       feedVSstyle(msg){
@@ -283,12 +284,10 @@ import card from './card.vue';
         }]);
       },
       getMachineData(obj){
-        console.log("kkkk")
         api.machineParameterList(obj)
           .then(res => {
             //获取设备参数
             if(res.data.result=="success"){
-              console.log(res)
               this.machineParameterList = res.data.value.params;
             }
           });
@@ -337,11 +336,9 @@ import card from './card.vue';
       obj.uuid = this.$route.query.uuid;
       obj.openid = "oh9Djvup_15urtYmlsZIF-5SITeo";
       obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4";
-      console.log(obj)
       api.allMachineDropList(obj)
         .then(res => {
           if(res.data.result=="success"){
-              console.log(res.data)
             this.machinelist = res.data.values;
           }
         });
@@ -354,7 +351,6 @@ import card from './card.vue';
  
       },
       allMqttStatus:function(value){
-        console.log(value)
       },
       WHstatus:function(value){
         

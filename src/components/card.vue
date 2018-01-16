@@ -18,12 +18,17 @@
         </div>
         <div v-show="!show" >
           <div class="uuid" >{{item.alias}}</div>
-          <div class="val">{{textVal(item)}}</div>
+          <div class="val" v-show="!echart">{{textVal(item)}}</div>
           
         </div>
-        <div v-if="ExecState" >
-          <div class="state" v-bind:style="{backgroundColor:bgcolor}">{{state}}</div>
-          <div class="val">开始时间:{{item.time}}</div>
+        <div v-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_ExecState'">
+          <div v-show="!echart" class="state" v-bind:style="{backgroundColor:bgcolor}" v-if="ExecState">{{state}}</div>
+          <div v-show="!echart" class="val">开始时间:{{item.time}}</div>
+        </div>
+        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency'? true : false">
+          <echart :option="setOption"></echart>
+        </div>
+        <div>
         </div>
       </router-link>
     </el-card>
@@ -36,6 +41,7 @@
 
 <script type="text/javascript">
 import {mapState} from 'vuex'
+import echart from './echart.vue'
   export default{
     props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState"],
     data(){
@@ -46,6 +52,7 @@ import {mapState} from 'vuex'
         bgcolor:'',
         state:'',
         runData:[],
+        echart:false,
         ExecStateState:this.WHstatus_ExecState
       }
     },
@@ -56,9 +63,12 @@ import {mapState} from 'vuex'
         }else if(this.mqtuuid){
           this.arr = this.mqtuuid;
           this.show = true;
-        }else{
+        }else if(this.WHstatus_ExecState){
           this.show = false;
         }
+    },
+    components:{
+      echart
     },
     computed:{
       ...mapState(['aliasMqtt']),
@@ -69,8 +79,34 @@ import {mapState} from 'vuex'
           }
         })
       },
+      setOption(){
+        let obj = {};
+        obj.title = "今日工时分布";
+        let arr = [];
+        if(this.item.value!==null&&this.item.value){
+          for(var i = 0;i<this.item.value.length;i++){
+          console.log(this.item.value)
+            let o = {};
+            if(this.item.value[i].status == "Running"){
+              o.name = "加工";
+              o.value = this.item.value[i].time;
+            }else if(this.item.value[i].status == "Estop"){
+              o.name = "紧停";
+              o.value = this.item.value[i].time;
+            }else if(this.item.value[i].status == "Idle"){
+              o.name = "空闲";
+              o.value = this.item.value[i].time;
+            }else if(this.item.value[i].status == "Offline"){
+              o.name = "离线";
+              o.value = this.item.value[i].time;
+            }
+            arr.push(o)
+          }
+        }
+        obj.data = arr;
+        return obj
+      },
       ExecState:function(){
-        console.log(this.WHstatus_ExecState)
         if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status=="WHstatus_ExecState"){
           
           if(this.WHstatus_ExecState.value=="Running"){
@@ -87,8 +123,13 @@ import {mapState} from 'vuex'
             this.bgcolor = "gray";
           }
           return true
-        }else if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status == "WHstatus_FeedV"){
-          this.state = "WHstatus_FeedV"
+        }else if(this.WHstatus_ExecState&&this.item.status == "WHstatus_FeedV"){
+          console.log(this.item)
+          this.echart = true;
+          this.setOption = {
+            title:'今日工时分布',
+
+          }
           return true
         }
       }
@@ -157,8 +198,8 @@ import {mapState} from 'vuex'
       arr:function(value){
         
       },
-      'WHstatus_ExecState.value':function(newValue, oldValue){
-        console.log(newValue)
+      WHstatus_ExecState:function(newValue){
+        
       }
     }
   }

@@ -9,17 +9,21 @@
 <script type="text/javascript">
   import echarts from 'echarts'
   export default {
+    props:['option'],
     data() {
       return {
-        chart:null
+        chart:null,
+        legend:[],
+        data:this.option
       }
     },
     methods:{
       drawGraph() { 
+         var that = this;
          this.chart = echarts.init(document.getElementById("main"));
          this.chart.setOption({
             title : {
-                text: '某站点用户访问来源',
+                text: this.data.title,
                 x:'center'
             },
             tooltip : {
@@ -29,10 +33,14 @@
             legend: {
                 orient: 'vertical',
                 left: 'right',
-                textStyle:{
-                  color:'rgba(255, 255, 255, 0.6)'
-                },
-                data: ['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+                data: this.legend,
+                formatter:function(name){
+                  for(var i=0;i<that.data.data.length;i++){
+                    if(name == that.data.data[i].name){
+                      return that.data.data[i].name + " "+ that.data.data[i].value;
+                    }
+                  }
+                }
             },
             series : [
                 {
@@ -40,13 +48,7 @@
                     type: 'pie',
                     radius : '55%',
                     center: ['50%', '60%'],
-                    data:[
-                        {value:335, name:'直接访问'},
-                        {value:310, name:'邮件营销'},
-                        {value:234, name:'联盟广告'},
-                        {value:135, name:'视频广告'},
-                        {value:1548, name:'搜索引擎'}
-                    ],
+                    data:this.data.data,
                     labelLine:{
                         normal:{
                           show:false
@@ -70,7 +72,18 @@
       } 
     },
     mounted(){
+      if(this.data.data){
+        for(var i=0;i<this.data.data.length;i++){
+          this.legend.push(this.data.data[i].name)
+        }
+      }
       this.drawGraph();
+    },
+    watch:{
+      option:function(value){
+        this.data = value;
+        this.drawGraph();
+      }
     }
   }
 </script>
