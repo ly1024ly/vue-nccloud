@@ -265,6 +265,9 @@ import echart from './echart.vue'
         
       },
       WHstatus_ExecState:function(newValue){
+      },
+      item:function(val){
+
       }
     }
   }

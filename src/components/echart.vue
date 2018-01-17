@@ -25,7 +25,6 @@
         var that = this;
         this.chart = echarts.init(document.getElementById(id));
         let legend = [];
-        console.log(data)
         for(var i=0;i<data.data.length;i++){
           legend.push(data.data[i].name)
         }
@@ -81,7 +80,6 @@
     },
     mounted(){
       this.num.push(this.option)
-      console.log(this.option,this.id)
       this.data = this.option;
       if(this.data&&this.data.data){
         for(var i=0;i<this.data.data.length;i++){
@@ -98,7 +96,10 @@
       },
       num:function(val){
         
+      },
+      item:function(val){
       }
+
     }
   }
 </script>

@@ -10,7 +10,7 @@
     </el-dropdown>
     <div class="card-content">
       <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item"></card>
-      <card v-for="(item,index) in innerText" :key="index+allMqttStatus.length" :item="item"  :allMqttStatus="allMqttStatus"></card>
+      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" ></card>
       <el-card class="box-card" @click="open4">
         <el-button type="text" @click="open4"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
@@ -46,6 +46,7 @@ import card from './card.vue';
         mqtts:[],
         WHstatus:{},
         yester:{},
+        innerCard:[],
         echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency"]
       }
     },
@@ -57,14 +58,18 @@ import card from './card.vue';
       getEcharts:function(){
         let arr = [];
         arr.push(this.yester);
+        let that = this;
         this.allMqttStatus.filter(t => {
-          this.echartsMqtt.forEach(function(val){
-            if(val==t.status){
-              arr.push(t)
-            }
-          })
+          if(t.uuid==that.uuid){
+            t.data.forEach(function(data){
+              that.echartsMqtt.forEach(function(val){
+                if(val==data.status){
+                  arr.push(data)
+                }
+              })
+            })
+          }
         });
-        
         return arr
       }
     },
@@ -168,9 +173,15 @@ import card from './card.vue';
                 status:"WHstatus_Efficiency_yester",
                 value:res.data.value.duration
               }
+              console.log(o)
               this.yester = o;
             }else{
-              this.yester = {};
+              let val = [{status:"Estop",time:0},{status:"Idle",time:0},{status:"Running",time:0},{status:"Offline",time:1}]
+              this.yester = {
+                uuid:this.uuid ? this.uuid : this.$route.query.uuid,
+                status:"WHstatus_Efficiency_yester",
+                value:val
+              };
             }
           })
       },
@@ -221,79 +232,155 @@ import card from './card.vue';
               for(var i=0;i<_this.machineParameterList.length;i++){
                 if(ar[1]==_this.machineParameterList[i].key){
                   if(_this.innerText.length==0){
+                  //如果innerText里面是空
+                    let param = {};
+                    param.uuid = ar[0];
+                    param.data = [];
                     let obj = {
                       status:ar[1],
                       value:ar[2],
                       time:ar[3],
                       alias:_this.machineParameterList[i].value
                     }
-                    _this.innerText.push(obj)
+                    param.data.push(obj);
+                    _this.innerText.push(param); 
                   }else{
                     let flag = true;
-                    let newArr = [];
                     _this.innerText.forEach(function(val){
-                      var newObj = {};
-                      if(val.status==ar[1]){
+                      let flagid = true;
+                      if(val.uuid==ar[0]){
+                      //判断里面是否有uuid相同的情况
+                        flagid = false;
                         flag = false;
-                        newObj.status = ar[1];
-                        newObj.value = ar[2];
-                        newObj.time = ar[3];
-                        newObj.alias = _this.machineParameterList[i].value;
-                        newArr.push(newObj)
-                      }else{
-                        newArr.push(val)
+                        let flagData = true;
+                        let newDataObj = {};
+                        let newDataArr = [];
+                        val.data.forEach(function(three){
+                          if(three.status==ar[1]){
+                          //判断status是相同就直接将里面对象替换并放到个新的数组里面
+                            flagData = false;
+                            newDataObj.status = ar[1];
+                            newDataObj.value = ar[2];
+                            newDataObj.time = ar[3];
+                            newDataObj.alias = _this.machineParameterList[i].value;
+                            newDataArr.push(newDataObj)
+                          }else{
+                          //不同就直接放到新的数组里面,该uuid下新的data数组
+                            
+                            newDataArr.push(three);
+                          }
+                        });
+                        if(flagData){
+                        //该uuid下没有这个status,将uuid的data里push个新对象
+                          let o = {
+                            status:ar[1],
+                            value:ar[2],
+                            time:ar[3],
+                            alias:_this.machineParameterList[i].value
+                          }
+                          _this.innerText.forEach(function(one){
+                            if(one.uuid==val.uuid){
+                              one.data.push(o)
+                            }
+                          })
+                        }else{
+                        //该uuid下有status，将uuid的data付值为newDataArr;
+                         _this.innerText.forEach(function(two){
+                            if(two.uuid==val.uuid){
+                              two.data = newDataArr;
+                            }
+                          })
+                        }
                       }
                     });
                     if(flag){
-                        let obj = {
-                          status:ar[1],
-                          value:ar[2],
-                          time:ar[3],
-                          alias:_this.machineParameterList[i].value
-                        }
-                        _this.innerText.push(obj)
-                    }else{
-                        _this.innerText = newArr;
+                    //如果没有这个uuid的对象
+                      let param = {};
+                      param.uuid = ar[0];
+                      param.data = [];
+                      let newObj = {};
+                      newObj.status = ar[1];
+                      newObj.value = ar[2];
+                      newObj.time = ar[3];
+                      newObj.alias = _this.machineParameterList[i].value;
+                      param.data.push(newObj);
+                      _this.innerText.push(param);
                     }
                   }       
                 }
               };
               //生成allMqttStatus数组
               if(_this.allMqttStatus.length==0){
+                let param = {};
+                param.uuid = ar[0];
+                param.data = [];
                 let obj = {
-                  uuid:ar[0],
                   status:ar[1],
                   value:ar[2],
-                  time:ar[3]
+                  time:ar[3],
                 }
-                _this.allMqttStatus.push(obj)
+                param.data.push(obj);
+                _this.allMqttStatus.push(param);
               }else{
-                let flag = true;
-                let newArr = [];
-                _this.allMqttStatus.forEach(function(val){
-                  var newObj = {};
-                  if(val.status==ar[1]){
-                    flag = false;
-                    newObj.uuid = ar[0];
-                    newObj.status = ar[1];
-                    newObj.value = ar[2];
-                    newObj.time = ar[3];
-                    newArr.push(newObj)
-                  }else{
-                    newArr.push(val)
-                  }
-                });
-                if(flag){
-                    let obj = {
-                      uuid:ar[0],
-                      status:ar[1],
-                      value:ar[2],
-                      time:ar[3]
+                    let flag = true;
+                    _this.allMqttStatus.forEach(function(val){
+                      let flagid = true;
+                      if(val.uuid==ar[0]){
+                      //判断里面是否有uuid相同的情况
+                        flagid = false;
+                        flag = false;
+                        let flagData = true;
+                        let newDataObj = {};
+                        let newDataArr = [];
+                        val.data.forEach(function(three){
+                          if(three.status==ar[1]){
+                          //判断status是相同就直接将里面对象替换并放到个新的数组里面
+                            flagData = false;
+                            newDataObj.status = ar[1];
+                            newDataObj.value = ar[2];
+                            newDataObj.time = ar[3];
+                            newDataArr.push(newDataObj)
+                          }else{
+                          //不同就直接放到新的数组里面,该uuid下新的data数组
+                            
+                            newDataArr.push(three);
+                          }
+                        });
+                        if(flagData){
+                        //该uuid下没有这个status,将uuid的data里push个新对象
+                          let o = {
+                            status:ar[1],
+                            value:ar[2],
+                            time:ar[3],
+                          }
+                          _this.allMqttStatus.forEach(function(one){
+                            if(one.uuid==val.uuid){
+                              one.data.push(o)
+                            }
+                          })
+                        }else{
+                        //该uuid下有status，将uuid的data付值为newDataArr;
+                         _this.allMqttStatus.forEach(function(two){
+                            if(two.uuid==val.uuid){
+                              two.data = newDataArr;
+                            }
+                          })
+                        }
+                      }
+                    });
+                    if(flag){
+                    //如果没有这个uuid的对象
+                      let param = {};
+                      param.uuid = ar[0];
+                      param.data = [];
+                      let newObj = {};
+                      newObj.status = ar[1];
+                      newObj.value = ar[2];
+                      newObj.time = ar[3];
+                      param.data.push(newObj);
+                      _this.allMqttStatus.push(param);
                     }
-                    _this.allMqttStatus.push(obj)
-                }else{
-                    _this.allMqttStatus = newArr;
-                }
+
               }       
             _this.mqtts = ar;
         })
@@ -372,6 +459,7 @@ import card from './card.vue';
  
       },
       allMqttStatus:function(value){
+        console.log(value)
       },
       WHstatus:function(value){
         
@@ -384,9 +472,23 @@ import card from './card.vue';
         obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4";
         this.getMachineData(obj);
         this.uuid = val;
+        if(!this.uuid){
+          this.uuid = this.$route.query.uuid;
+        }
+        var that = this;
+        this.innerText.forEach(function(o){
+          if(o.uuid==that.uuid){
+            that.innerCard = o.data;
+          }
+        })
       },
       innerText(val){
-        
+        var that = this;
+        val.forEach(function(o){
+          if(o.uuid==that.uuid){
+            that.innerCard = o.data;
+          }
+        })
       }
     }
   }
