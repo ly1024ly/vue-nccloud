@@ -29,7 +29,11 @@
           <echart :option="setOptions(item)"  :id="item.status"></echart>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency_yester'? true : false">
-         <echart :option="setOptions(item)"  :id="item.status"></echart>
+          <echart :option="setOptions(item)"  :id="item.status"></echart>
+        </div>
+        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Error'? true : false">
+          <div class="uuid">消息报警</div>
+          <div>{{item.value}}</div>
         </div>
         <div>
         </div>

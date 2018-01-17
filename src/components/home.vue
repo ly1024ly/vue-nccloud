@@ -105,7 +105,7 @@
     
     <el-container :class="cla">
        <el-header style="text-align: right; font-size: 12px;position:relative;">
-        <div class="title">{{title}}</div>
+        <div class="title" style="fontSize:20px;">{{title}}</div>
       </el-header>
       <el-main>
       	<transition-group name="fade" mode="out-in">

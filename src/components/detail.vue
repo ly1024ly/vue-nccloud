@@ -47,7 +47,7 @@ import card from './card.vue';
         WHstatus:{},
         yester:{},
         innerCard:[],
-        echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency"]
+        echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency","WHstatus_Error"]
       }
     },
     components:{
@@ -173,7 +173,6 @@ import card from './card.vue';
                 status:"WHstatus_Efficiency_yester",
                 value:res.data.value.duration
               }
-              console.log(o)
               this.yester = o;
             }else{
               let val = [{status:"Estop",time:0},{status:"Idle",time:0},{status:"Running",time:0},{status:"Offline",time:1}]
@@ -229,6 +228,7 @@ import card from './card.vue';
         var _this = this;
         var detailMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
             ar = [_1, _2, _3, _4];
+            console.log(ar)
               for(var i=0;i<_this.machineParameterList.length;i++){
                 if(ar[1]==_this.machineParameterList[i].key){
                   if(_this.innerText.length==0){
@@ -309,6 +309,12 @@ import card from './card.vue';
                   }       
                 }
               };
+              console.log(_this.innerText)
+              _this.innerText.forEach(function(o){
+                if(o.uuid==_this.uuid){
+                  _this.innerCard = o.data;
+                }
+              })
               //生成allMqttStatus数组
               if(_this.allMqttStatus.length==0){
                 let param = {};
@@ -484,11 +490,7 @@ import card from './card.vue';
       },
       innerText(val){
         var that = this;
-        val.forEach(function(o){
-          if(o.uuid==that.uuid){
-            that.innerCard = o.data;
-          }
-        })
+        
       }
     }
   }
