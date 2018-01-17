@@ -16,8 +16,8 @@ Vue.prototype.$echarts = echarts
 const i18n = new VueI18n({
   locale:'zh-CN',
   messages:{
-    'zh-CN':require('./lang/cn.js'),
-    'zh-US':require('./lang/en.js')
+    'zh-CN':require('./i18n/lang/cn.js'),
+    'zh-US':require('./i18n/lang/en.js')
   }
 });
 

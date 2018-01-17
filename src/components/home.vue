@@ -14,7 +14,7 @@
         <span class="el-dropdown-link">
           {{language}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
-        <el-dropdown-menu slot="dropdown">
+        <el-dropdown-menu slot="dropdown" >
           <el-dropdown-item :command="cn">中文</el-dropdown-item>
           <el-dropdown-item :command="en">英文(English)</el-dropdown-item>
         </el-dropdown-menu>
@@ -142,8 +142,8 @@
         show:true,
         is:true,
         title:'',
-        cn:'中文',
-        en:'英文(English)',
+        cn:'cn',
+        en:'en',
         language:'多语言',
         class:'el-icon-d-arrow-left',
   			objStyle:{
@@ -176,6 +176,7 @@
         this.title = value;
       },
       changeLang(command){
+        console.log(command)
         this.language = command
       },
       warningSucc(value){
