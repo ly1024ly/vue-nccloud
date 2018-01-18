@@ -152,7 +152,7 @@ import Cookies from 'js-cookie'
   		}
 	  },
     mounted(){
-        console.log(Cookies.get('locale'))
+        console.log(document.cookie)
       let lang = Cookies.get('locale');
       if(lang=="zh-CN"){
           this.language = "中文";

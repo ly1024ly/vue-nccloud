@@ -4,6 +4,7 @@ var baseUrl = "https://nccloud.weihong.com.cn/ncmes/";
 var baseUrl1 = "https://nccloud.weihong.com.cn/nccloudpdcapi/";
 var baseUrl2 = "https://nccloud.weihong.com.cn/api/device/";
 var baseUrl3 = 'https://nccloud.weihong.com.cn/nccloudOLhelp/search/';
+import Cookies from 'js-cookie'
 const Interface = {
   //  1、注册的请求接口
   registerAjax: baseUrl + 'web/register',
@@ -99,6 +100,12 @@ const Interface = {
 }
 
 
+const user = {
+  username:Cookies.get("username"),
+  openid:Cookies.get("openid"),
+  token:Cookies.get("token")
+}
+
 export const userLogin = param => {
   return post(`${baseUrl}/web/login`,param)
 }
@@ -107,24 +114,28 @@ export const vercode = param => {
   return get(`${baseUrl}/vercode/${param.phone}?=${param.num}`)
 }
 //消息报警
-export const htrMsg = param => {
-    return get(`${baseUrl2}/device/focusmachine/fivealarm?username=${param.username}&token=${param.token}`)
+export const htrMsg = () => {
+    return get(`${baseUrl2}/device/focusmachine/fivealarm?username=${user.username}&token=${user.token}`)
 }
 //去获取关注设备，并以磁铁形式展示
 
-export const getFocusMachine = param => {
-    return get(`${baseUrl}/focusmachinelist?username=${param.username}&openid=${param.openid}&token=${param.token}`)
+export const getFocusMachine = () => {
+    return get(`${baseUrl}/focusmachinelist?username=${user.username}&openid=${user.openid}&token=${user.token}`)
 }
 
 export const machineParameterList = param => {
-  return get(`${Interface.getHomeParameters}/?username=${param.username}&uuid=${param.uuid}&token=${param.token}`)
+  return get(`${Interface.getHomeParameters}/?username=${user.username}&uuid=${param.uuid}&token=${user.token}`)
 }
 
 export const allMachineDropList = param => {
-  return get(`${Interface.allMachines}?username=${param.username}&openid=${param.openid}&token=${param.token}`)
+  return get(`${Interface.allMachines}?username=${user.username}&openid=${user.openid}&token=${user.token}`)
 }
 
 export const yesterdayEfficiency = param => {
   let times = new Date(new Date().getTime() + 8 * 3600 * 1000 - 24 * 3600 * 1000).toISOString().substr(0, 10);
   return get(`${Interface.efficiency}?uuid=${param.uuid}&timestamp=${times}&token=${param.token}`)
+}
+
+export const addMachineParameters = param =>{
+  return get(`${Interface.getDetailMachineParemeter}?uuid=${param.uuid}&username=${user.username}&token=${user.token}`)
 }

@@ -11,10 +11,23 @@
     <div class="card-content">
       <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item"></card>
       <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" ></card>
-      <el-card class="box-card" @click="open4">
-        <el-button type="text" @click="open4"><i class="el-icon-circle-plus" ></i></el-button>
+      <el-card class="box-card"  @click="dialogVisible = true">
+        <el-button type="text"  @click="dialogVisible = true"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
     </div>
+    <el-dialog
+      title="请为新添加的展示块选择内容"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :before-close="handleClose">
+      <select v-model="selected">
+        <option v-for="(item,index) in li" :key="index" :value="item">{{item.value}}</option>
+      </select>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -48,6 +61,9 @@ import Cookies from 'js-cookie'
         WHstatus:{},
         yester:{},
         innerCard:[],
+        li:[],
+        selected:'选择内容',
+        dialogVisible: false,
         echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency","WHstatus_Error"]
       }
     },
@@ -168,13 +184,15 @@ import Cookies from 'js-cookie'
             }
           })
       },
+      paramSelect(value){
+        console.log(value)
+      },
       detailMqtt(uuid){
         let pass = md5("ly1024");
         let ar = [];
         var _this = this;
         var detailMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
             ar = [_1, _2, _3, _4];
-            console.log(ar)
               for(var i=0;i<_this.machineParameterList.length;i++){
                 if(ar[1]==_this.machineParameterList[i].key){
                   if(_this.innerText.length==0){
@@ -351,37 +369,12 @@ import Cookies from 'js-cookie'
           });
         this.detailMqtt(obj.uuid)
       },
-      open4() {
-        const h = this.$createElement;
-        this.$msgbox({
-          title: '消息',
-          message: h('p', null, [
-            h('span', null, '内容可以是 '),
-            h('i', { style: 'color: teal' }, 'VNode')
-          ]),
-          showCancelButton: true,
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          beforeClose: (action, instance, done) => {
-            if (action === 'confirm') {
-              instance.confirmButtonLoading = true;
-              instance.confirmButtonText = '执行中...';
-              setTimeout(() => {
-                done();
-                setTimeout(() => {
-                  instance.confirmButtonLoading = false;
-                }, 300);
-              }, 3000);
-            } else {
-              done();
-            }
-          }
-        }).then(action => {
-          this.$message({
-            type: 'info',
-            message: 'action: ' + action
-          });
-        });
+      handleClose(done) {
+        this.$confirm('确认关闭？')
+          .then(_ => {
+            done();
+          })
+          .catch(_ => {});
       }
     },
     mounted(){
@@ -390,10 +383,7 @@ import Cookies from 'js-cookie'
       var _this = this;
       this.handleCommand(this.$route.query.alias);
       let obj = {};
-      obj.username = "ly1024";
       obj.uuid = this.$route.query.uuid;
-      obj.openid = "oh9Djvup_15urtYmlsZIF-5SITeo";
-      obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc1Mjk2MDAsImlhdCI6MTUxNDk3MjE1OH0.kxgTb-2Vwvq8cTA19fc75xsF3wW0nKsBmSYL73m3Ww4";
       api.allMachineDropList(obj)
         .then(res => {
           if(res.data.result=="success"){
@@ -432,13 +422,21 @@ import Cookies from 'js-cookie'
             that.innerCard = o.data;
           }
         })
+        api.addMachineParameters({uuid:this.uuid})
+          .then(function(res){
+            if(res.data.result=="success"){
+              that.li = res.data.value;
+            }
+          })
       },
       innerText(val){
         var that = this;
       },
       mqtts:function(val){
+        
+      },
+      selected:function(val){
         console.log(val)
-        console.log(this.innerText)
       }
     }
   }

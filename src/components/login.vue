@@ -110,7 +110,6 @@
         });
       },
       submitForm(formName) {
-      console.log(this.user)
         this.$refs[formName].validate((valid) => {
         var _this = this;
           if (valid) {
@@ -123,7 +122,8 @@
               .then(function(res){
                 if(res.data.result=="success"){
                   _this.setCookies(obj);
-                  
+                  Cookies.set('token',res.data.token);
+                  _this.setCookies(res.data.value);
                   _this.$router.push({path:'/warning'})
                 }else{
                   _this.open(res.data.message)

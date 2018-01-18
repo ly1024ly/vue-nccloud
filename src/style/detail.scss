@@ -1,6 +1,14 @@
 
   .detail{
     margin:0px;
+    .el-dialog__body select{
+      padding:10px;
+      border-radius:5px;
+    }
+    .el-dialog__body select option{
+      padding:4px;
+      border-bottom:1px solid #eee;
+    }
     .el-dropdown-link {
       cursor: pointer;
       color: #409EFF;

@@ -130,11 +130,7 @@ import card from './card.vue';
     },
     mounted(){
       document.title = this.$route.name;
-      var obj = {};
-      obj.username = "ly1024";
-      obj.openid = "undefined";
-      obj.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjY4ODI2NTgiLCJleHAiOjE1MTc5NjE2MDAsImlhdCI6MTUxNTQwOTM0OX0.oVMsMQMO2HGIxVSBPVuAvaLAOmZZc4g3nXlh8OwPONk"
-       api.getFocusMachine(obj)
+       api.getFocusMachine()
         .then(res => {
           if(res.data.result=="success"){
             this.$emit("success","success");
