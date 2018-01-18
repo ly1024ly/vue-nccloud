@@ -81,22 +81,6 @@ import Cookies from 'js-cookie'
         this.yesterEffi();
         this.$emit("title",command.alias)
       },
-      WHstatusData:function(t){
-        if(t.status == "WHstatus_ExecState"){
-          this.WHstatus = t;
-          return true
-        }
-      },
-      innerMsg(key){
-        let name = this.innerText;  
-        let result; 
-        for(let i=0;i<name.length;i++){
-          if(key==name[i].status){
-            result = this.rule(name[i])
-          }
-        }
-        return result
-      },
       feedVSstyle(msg){
         var t = msg * 60 + " ";
         var t1 = t.indexOf('.');

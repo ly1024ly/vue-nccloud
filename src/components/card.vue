@@ -70,13 +70,18 @@ import echart from './echart.vue'
     },
     mounted(){
         if(this.allMqttStatus){
+        //如果是设备详情8个设备参数
           this.arr = this.allMqttStatus;
+        //生产监控里的页面
           this.show = false;
+        //删除icon
           this.icon = true;
         }else if(this.mqtuuid){
+        //当传来的是生产监控页面时的
           this.arr = this.mqtuuid;
           this.show = true;
         }else if(this.WHstatus_ExecState){
+        //echarts图表里的参数
           this.show = false;
         }
     },
@@ -91,64 +96,6 @@ import echart from './echart.vue'
             return true
           }
         })
-      },
-      yesOption(){
-        let obj = {};
-        obj.title = "昨日工时分布";
-        let arr = [];
-        if(this.item.value!==null&&this.item.value){
-          for(var i = 0;i<this.item.value.length;i++){
-            let o = {};
-            if(this.item.value[i].status == "Running"){
-              o.name = "加工";
-              o.value = this.item.value[i].time;
-            }else if(this.item.value[i].status == "Estop"){
-              o.name = "紧停";
-              o.value = this.item.value[i].time;
-            }else if(this.item.value[i].status == "Idle"){
-              o.name = "空闲";
-              o.value = this.item.value[i].time;
-            }else if(this.item.value[i].status == "Offline"){
-              o.name = "离线";
-              o.value = this.item.value[i].time;
-            }
-            arr.push(o)
-          }
-        }
-        obj.data = arr;
-        return obj  
-      },
-      setOption(){
-        let obj = {};
-        if(this.item.status=="WHstatus_Efficiency"){
-          obj.title = "今日工时分布";
-          obj.status = this.item.status;
-        }else if(this.item.status=="WHstatus_Efficiency_yester"){
-          obj.title = "昨日工时分布";
-          obj.status = this.item.status;
-        }
-        let arr = [];
-        if(this.item.value!==null&&this.item.value){
-          for(var i = 0;i<this.item.value.length;i++){
-            let o = {};
-            if(this.item.value[i].status == "Running"){
-              o.name = "加工";
-              o.value = this.item.value[i].time;
-            }else if(this.item.value[i].status == "Estop"){
-              o.name = "紧停";
-              o.value = this.item.value[i].time;
-            }else if(this.item.value[i].status == "Idle"){
-              o.name = "空闲";
-              o.value = this.item.value[i].time;
-            }else if(this.item.value[i].status == "Offline"){
-              o.name = "离线";
-              o.value = this.item.value[i].time;
-            }
-            arr.push(o)
-          }
-        }
-        obj.data = arr;
-        return obj
       },
       ExecState:function(){
         if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status=="WHstatus_ExecState"){
