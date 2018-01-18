@@ -393,6 +393,7 @@ import Cookies from 'js-cookie'
       this.getMachineData(obj);
       this.$emit("title",this.$route.query.alias);
       this.yesterEffi();
+
     },
     watch:{
       mqtts:function(ar){
@@ -431,12 +432,59 @@ import Cookies from 'js-cookie'
       },
       innerText(val){
         var that = this;
+        let addMachine;
+        if(sessionStorage.obj){
+          addMachine = JSON.parse(sessionStorage.obj);
+        }
+        if(addMachine){
+          addMachine.forEach(function(add){
+            let obj;
+            console.log(add)
+            val.forEach(function(vals){
+            console.log(vals)
+            console.log(add)
+              if(add.uuid == vals.uuid){
+                obj = {
+                  alias:add.alias,
+                  status:add.status,
+                  time:add.time,
+                  value:add.value
+                }
+              }
+              vals.data.push(obj)
+            })
+  
+          })
+        }
       },
       mqtts:function(val){
         
       },
       selected:function(val){
-        console.log(val)
+        console.log(val,this.innerText);
+        let that = this;
+        that.innerText.forEach(function(rel){
+          if(rel.uuid == that.uuid){
+            let obj = {};
+            obj.alias = val.value;
+            obj.status = val.key;
+            obj.time = "";
+            obj.value = "";
+            rel.data.push(obj);
+            obj.uuid = that.uuid;
+            let o = [];
+            console.log()
+            if(!sessionStorage.obj){
+              o.push(obj);
+            } else {
+               o = JSON.parse(sessionStorage.obj);
+              
+              o.push(obj);
+            }
+            sessionStorage.obj = JSON.stringify(o);
+          }
+        })
+        console.log(JSON.parse(sessionStorage.obj))
       }
     }
   }
