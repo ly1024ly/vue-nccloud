@@ -123,6 +123,7 @@
               .then(function(res){
                 if(res.data.result=="success"){
                   _this.setCookies(obj);
+                  
                   _this.$router.push({path:'/warning'})
                 }else{
                   _this.open(res.data.message)

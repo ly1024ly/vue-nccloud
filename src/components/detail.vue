@@ -2,7 +2,7 @@
   <div class="detail">
     <el-dropdown  @command="handleCommand">
       <span class="el-dropdown-link">
-        选择设备<i class="el-icon-arrow-down el-icon--right"></i>
+        {{ $t("message.select") }}<i class="el-icon-arrow-down el-icon--right"></i>
       </span>
       <el-dropdown-menu slot="dropdown" >
         <el-dropdown-item v-for="(item,index) in machinelist" :command="item" :key="index">{{item.alias}}</el-dropdown-item>
@@ -29,6 +29,7 @@ import NcMqttClient from '../mqtt/mqttEchart.js';
 import md5 from 'js-md5';
 import echart from './echart.vue';
 import card from './card.vue';
+import Cookies from 'js-cookie'
 
   export default{
     data(){
@@ -76,7 +77,6 @@ import card from './card.vue';
     methods:{
       ...mapMutations(['CHANGEALIAS']),
       handleCommand(command) {
-
         this.uuid = command.uuid;
         this.yesterEffi();
         this.$emit("title",command.alias)
@@ -184,44 +184,6 @@ import card from './card.vue';
             }
           })
       },
-      forceData(ar,data){
-        if(data.length==0){
-          let obj = {
-            uuid:ar[0],
-            status:ar[1],
-            value:ar[2],
-            time:ar[3]
-          }
-          data.push(obj)
-        }else{
-          let flag = true;
-          let newArr = [];
-          data.forEach(function(val){
-            var newObj = {};
-            if(val.status==ar[1]){
-              flag = false;
-              newObj.uuid = ar[0];
-              newObj.status = ar[1];
-              newObj.value = ar[2];
-              newObj.time = ar[3];
-              newArr.push(newObj)
-            }else{
-              newArr.push(val)
-            }
-          });
-          if(flag){
-              let obj = {
-                uuid:ar[0],
-                status:ar[1],
-                value:ar[2],
-                time:ar[3]
-              }
-              data.push(obj)
-          }else{
-              data = newArr;
-          }
-        }       
-      },
       detailMqtt(uuid){
         let pass = md5("ly1024");
         let ar = [];
@@ -309,7 +271,6 @@ import card from './card.vue';
                   }       
                 }
               };
-              console.log(_this.innerText)
               _this.innerText.forEach(function(o){
                 if(o.uuid==_this.uuid){
                   _this.innerCard = o.data;
@@ -490,7 +451,10 @@ import card from './card.vue';
       },
       innerText(val){
         var that = this;
-        
+      },
+      mqtts:function(val){
+        console.log(val)
+        console.log(this.innerText)
       }
     }
   }

@@ -22,50 +22,50 @@
     </el-menu-item>
   </el-menu>
   <el-container style="height: 100%; border: 1px solid #eee">
-    <el-aside width="200px" style="background-color: rgb(238, 241, 246)" v-show="is">
+    <el-aside width="260px" style="background-color: rgb(238, 241, 246)" v-show="is">
       <el-menu >
         
       <el-menu-item index="1" @click="warning('warning')" >
         <i class="el-icon-bell"></i>
-        <span slot="title">消息报警</span>
+        <span slot="title">{{ $t("message.menu1") }}</span>
       </el-menu-item>
     
       <el-menu-item index="2" @click="production('production')">
         <i class="el-icon-menu"></i>
-        <span slot="title">生产监控</span>
+        <span slot="title">{{ $t("message.menu2") }}</span>
       </el-menu-item>
         <router-link to="warning">
           <el-menu-item index="3">
             <i class="el-icon-menu"></i>
-            <span slot="title">全部设备</span>
+            <span slot="title">{{ $t("message.menu3") }}</span>
           </el-menu-item>
         </router-link>
         <router-link to="warning">
           <el-menu-item index="4">
             <i class="el-icon-menu"></i>
-            <span slot="title">智能报警</span>
+            <span slot="title">{{ $t("message.menu4") }}</span>
           </el-menu-item>
         </router-link>
         <router-link to="warning">
           <el-menu-item index="5">
             <i class="el-icon-menu"></i>
-            <span slot="title">帮助中心</span>
+            <span slot="title">{{ $t("message.menu5") }}</span>
           </el-menu-item>
         </router-link>
         <router-link to="warning">
           <el-menu-item index="6">
             <i class="el-icon-menu"></i>
-            <span slot="title">我的收藏</span>
+            <span slot="title">{{ $t("message.menu6") }}</span>
           </el-menu-item>
         </router-link>
         <router-link to="warning">
           <el-menu-item index="7">
             <i class="el-icon-menu"></i>
-            <span slot="title">用户信息</span>
+            <span slot="title">{{ $t("message.menu7") }}</span>
           </el-menu-item>
         </router-link>
         <el-submenu index="8">
-          <template slot="title"><i class="el-icon-menu"></i>自定义模版</template>
+          <template slot="title"><i class="el-icon-menu"></i>{{ $t("message.menu8") }}</template>
           <el-menu-item-group>
             <template slot="title">分组一</template>
             <el-menu-item index="2-1">选项1</el-menu-item>
@@ -80,7 +80,7 @@
           </el-submenu>
         </el-submenu>
         <el-submenu index="9">
-          <template slot="title"><i class="el-icon-menu"></i>更多服务</template>
+          <template slot="title"><i class="el-icon-menu"></i>{{ $t("message.menu9") }}</template>
           <el-menu-item-group>
             <template slot="title">分组一</template>
             <el-menu-item index="2-1">选项1</el-menu-item>
@@ -97,7 +97,7 @@
         <router-link to="login">
           <el-menu-item index="10">
             <i class="el-icon-menu"></i>
-            <span slot="title">安全离开</span>
+            <span slot="title">{{ $t("message.menu10") }}</span>
           </el-menu-item>
         </router-link>
       </el-menu>
@@ -134,7 +134,7 @@
 </style>
 
 <script>
-
+import Cookies from 'js-cookie'
   export default {
     data() {
   		return {
@@ -142,8 +142,8 @@
         show:true,
         is:true,
         title:'',
-        cn:'cn',
-        en:'en',
+        cn:'zh-CN',
+        en:'zh-US',
         language:'多语言',
         class:'el-icon-d-arrow-left',
   			objStyle:{
@@ -152,6 +152,15 @@
   		}
 	  },
     mounted(){
+        console.log(Cookies.get('locale'))
+      let lang = Cookies.get('locale');
+      if(lang=="zh-CN"){
+          this.language = "中文";
+          this.$i18n.locale = 'zh-CN';
+      }else{
+          this.language = "英文English";
+          this.$i18n.locale = 'zh-US';
+      }
       if(this.$route.path=="/detail"){
         this.cla = "bgcolor";
       }else{
@@ -176,8 +185,14 @@
         this.title = value;
       },
       changeLang(command){
-        console.log(command)
-        this.language = command
+
+        this.$i18n.locale = command;
+        Cookies.set('locale',command);
+        if(command=="zh-CN"){
+          this.language = "中文"
+        }else{
+          this.language = "English"
+        }
       },
       warningSucc(value){
         if(value=="success"){

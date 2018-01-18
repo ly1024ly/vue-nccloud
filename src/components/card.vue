@@ -18,12 +18,16 @@
         </div>
         <div v-show="!show" >
           <div class="uuid" >{{item.alias}}</div>
+          <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
           <div class="val" v-show="!echart">{{textVal(item)}}</div>
-          
+          <i class="el-icon-remove" v-show="icon" v-if="item.status!=='WHstatus_ExecState'"></i>
         </div>
         <div v-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_ExecState'">
           <div v-show="!echart" class="state" v-bind:style="{backgroundColor:bgcolor}" v-if="ExecState">{{state}}</div>
           <div v-show="!echart" class="val">开始时间:{{item.time}}</div>
+        </div>
+        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_FeedV'? true : false">
+          <div>{{item}}</div>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency'? true : false">
           <echart :option="setOptions(item)"  :id="item.status"></echart>
@@ -60,6 +64,7 @@ import echart from './echart.vue'
         state:'',
         runData:[],
         echart:false,
+        icon:false,
         ExecStateState:this.WHstatus_ExecState
       }
     },
@@ -67,6 +72,7 @@ import echart from './echart.vue'
         if(this.allMqttStatus){
           this.arr = this.allMqttStatus;
           this.show = false;
+          this.icon = true;
         }else if(this.mqtuuid){
           this.arr = this.mqtuuid;
           this.show = true;
@@ -272,6 +278,9 @@ import echart from './echart.vue'
       },
       item:function(val){
 
+      },
+      allMqttStatus:function(val){
+        console.log(val)
       }
     }
   }

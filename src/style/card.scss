@@ -1,10 +1,20 @@
 $center:center;
 $color:#333;
 .card{
+  position:relative;
   .text {
     font-size: 14px;
   }
-
+  .el-icon-remove{
+    position:absolute;
+    bottom:20px;
+    font-size:20px;
+    color:gray;
+    right:20px;
+  }
+  .el-icon-remove:hover{
+    transform: scale(1.4);  
+  }
   .item {
     padding: 18px 0;
     text-align:$center;
@@ -26,6 +36,9 @@ $color:#333;
         font-size:14px;
         margin:8px 0px 20px 0px;
         color:$color;
+      }
+      .el-progress-bar__inner .el-progress-bar__innerText{
+        display:none;
       }
       .stat{
         text-align:right;
@@ -56,6 +69,7 @@ $color:#333;
       .state{
         width:100px;
         height:100px;
+        line-height:100px;
         border-radius:100px;
         text-align:center;
         margin:0 auto;

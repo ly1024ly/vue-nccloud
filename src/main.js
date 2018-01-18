@@ -13,6 +13,7 @@ Vue.use(ElementUI);
 Vue.use(VueI18n);
 Vue.prototype.$echarts = echarts
 
+
 const i18n = new VueI18n({
   locale:'zh-CN',
   messages:{
@@ -20,6 +21,7 @@ const i18n = new VueI18n({
     'zh-US':require('./i18n/lang/en.js')
   }
 });
+
 
 export default i18n;
 
