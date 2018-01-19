@@ -20,7 +20,7 @@
           <div class="uuid" >{{item.alias}}</div>
           <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
           <div class="val" v-show="!echart">{{textVal(item)}}</div>
-          <i class="el-icon-remove" v-show="icon" v-if="item.status!=='WHstatus_ExecState'"></i>
+          <i class="el-icon-remove" v-show="icon" v-if="item.status!=='WHstatus_ExecState'" @click="removeCard(item)"></i>
         </div>
         <div v-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_ExecState'">
           <div v-show="!echart" class="state" v-bind:style="{backgroundColor:bgcolor}" v-if="ExecState">{{state}}</div>
@@ -132,6 +132,9 @@ import echart from './echart.vue'
         }else if(this.allMqttStatus){
           return it.status = item.status;
         }
+      },
+      removeCard(rel){
+        this.$emit("remove",rel)
       },
       setOptions(item){
         let obj = {};

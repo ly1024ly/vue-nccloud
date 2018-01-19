@@ -1,5 +1,7 @@
 import post from './post.js';
 import get from './get.js';
+import put from './put.js';
+import del from './delete.js';
 var baseUrl = "https://nccloud.weihong.com.cn/ncmes/";
 var baseUrl1 = "https://nccloud.weihong.com.cn/nccloudpdcapi/";
 var baseUrl2 = "https://nccloud.weihong.com.cn/api/device/";
@@ -138,4 +140,22 @@ export const yesterdayEfficiency = param => {
 
 export const addMachineParameters = param =>{
   return get(`${Interface.getDetailMachineParemeter}?uuid=${param.uuid}&username=${user.username}&token=${user.token}`)
+}
+
+export const creatSaveMachineParameter = param =>{
+  let obj = {
+    uuid:param.uuid,
+    username:user.username,
+    params:param.val
+  }
+  return put(`${Interface.saveDetailMachineParemeter}?token=${user.token}`,obj)
+}
+
+export const rmParameter = param => {
+  let obj = {
+    uuid:param.uuid,
+    username:user.username,
+    param:param.val
+  }  
+  return del(`${Interface.rmParameters}?token=${user.token}&uuid=${param.uuid}&username=${user.username}&param=${param.val}`)
 }

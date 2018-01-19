@@ -10,7 +10,7 @@
     </el-dropdown>
     <div class="card-content">
       <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item"></card>
-      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" ></card>
+      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard"></card>
       <el-card class="box-card"  @click="dialogVisible = true">
         <el-button type="text"  @click="dialogVisible = true"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
@@ -20,12 +20,14 @@
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose">
-      <select v-model="selected">
+      <select v-model="selected" v-show="add">
         <option v-for="(item,index) in li" :key="index" :value="item">{{item.value}}</option>
       </select>
+      <div v-show="!add">确定要删除次参数吗?</div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="saveParam()" v-show="add">确 定</el-button>
+        <el-button type="primary" @click="removeParam()" v-show="!add">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -53,6 +55,7 @@ import Cookies from 'js-cookie'
         machineParameterList:[],
         msg:'',
         proData:0,
+        add:true,
         process:false,
         allMqttStatus:[],
         WHstatus_FeedVData:[],
@@ -62,6 +65,7 @@ import Cookies from 'js-cookie'
         yester:{},
         innerCard:[],
         li:[],
+        delete:{},
         selected:'选择内容',
         dialogVisible: false,
         echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency","WHstatus_Error"]
@@ -96,6 +100,56 @@ import Cookies from 'js-cookie'
         this.uuid = command.uuid;
         this.yesterEffi();
         this.$emit("title",command.alias)
+      },
+      removeCard(value){
+        this.dialogVisible = true;
+        this.add = false;
+        this.delete = value;
+      },
+      removeParam(){
+        let value = {
+          val:this.delete.status,
+          uuid:this.uuid
+        }
+        console.log(this.delete)
+        api.rmParameter(value)
+          .then(function(rel){
+            console.log(rel)
+          })
+      },
+      saveParam(){
+        this.dialogVisible = false;
+        let value = {
+          val:this.selected,
+          uuid:this.uuid
+        }
+        let val = this.selected;
+        let that = this;
+        api.creatSaveMachineParameter(value)
+          .then(function(rel){
+          console.log(rel)
+            if(rel.data.result == "success"){
+              that.innerText.forEach(function(rel){
+                if(rel.uuid == that.uuid){
+                  let obj = {};
+                  obj.alias = val.value;
+                  obj.status = val.key;
+                  obj.time = "";
+                  obj.value = "";
+                  rel.data.push(obj);
+                  obj.uuid = that.uuid;
+                  let o = [];
+                  if(!localStorage.obj){
+                    o.push(obj);
+                  } else {
+                     o = JSON.parse(localStorage.obj);
+                    o.push(obj);
+                  }
+                  localStorage.obj = JSON.stringify(o);
+                }
+              })
+            }
+          })
       },
       feedVSstyle(msg){
         var t = msg * 60 + " ";
@@ -185,7 +239,6 @@ import Cookies from 'js-cookie'
           })
       },
       paramSelect(value){
-        console.log(value)
       },
       detailMqtt(uuid){
         let pass = md5("ly1024");
@@ -230,7 +283,6 @@ import Cookies from 'js-cookie'
                             newDataArr.push(newDataObj)
                           }else{
                           //不同就直接放到新的数组里面,该uuid下新的data数组
-                            
                             newDataArr.push(three);
                           }
                         });
@@ -273,6 +325,7 @@ import Cookies from 'js-cookie'
                   }       
                 }
               };
+              _this.addParam(_this.machineParameterList)
               _this.innerText.forEach(function(o){
                 if(o.uuid==_this.uuid){
                   _this.innerCard = o.data;
@@ -359,14 +412,40 @@ import Cookies from 'js-cookie'
           "item": '+'
         }]);
       },
+      addParam(arr){
+        let that = this;
+        this.innerText.forEach(function(it){
+          arr.forEach(function(mp){
+            if(it.uuid == that.uuid){
+              let flag = true;
+              it.data.forEach(function(id){
+                if(id.status == mp.key){
+                  flag = false;
+                }
+              });
+              if(flag&&mp.value!==null){
+                let obj = {};
+                obj.alias = mp.value;
+                obj.status = mp.key;
+                obj.time = "";
+                obj.value = "";
+                it.data.push(obj);
+              }
+            }
+          })
+        })
+      },
       getMachineData(obj){
         api.machineParameterList(obj)
           .then(res => {
             //获取设备参数
             if(res.data.result=="success"){
+              let that = this;
               this.machineParameterList = res.data.value.params;
+              console.log(this.machineParameterList)
             }
           });
+        
         this.detailMqtt(obj.uuid)
       },
       handleClose(done) {
@@ -377,6 +456,7 @@ import Cookies from 'js-cookie'
           .catch(_ => {});
       }
     },
+
     mounted(){
       this.$emit("success","success");
       this.uuid = this.$route.query.uuid;
@@ -393,7 +473,7 @@ import Cookies from 'js-cookie'
       this.getMachineData(obj);
       this.$emit("title",this.$route.query.alias);
       this.yesterEffi();
-
+     
     },
     watch:{
       mqtts:function(ar){
@@ -401,7 +481,6 @@ import Cookies from 'js-cookie'
  
       },
       allMqttStatus:function(value){
-        console.log(value)
       },
       WHstatus:function(value){
         
@@ -432,59 +511,12 @@ import Cookies from 'js-cookie'
       },
       innerText(val){
         var that = this;
-        let addMachine;
-        if(sessionStorage.obj){
-          addMachine = JSON.parse(sessionStorage.obj);
-        }
-        if(addMachine){
-          addMachine.forEach(function(add){
-            let obj;
-            console.log(add)
-            val.forEach(function(vals){
-            console.log(vals)
-            console.log(add)
-              if(add.uuid == vals.uuid){
-                obj = {
-                  alias:add.alias,
-                  status:add.status,
-                  time:add.time,
-                  value:add.value
-                }
-              }
-              vals.data.push(obj)
-            })
-  
-          })
-        }
+        console.log(val)
       },
       mqtts:function(val){
         
       },
       selected:function(val){
-        console.log(val,this.innerText);
-        let that = this;
-        that.innerText.forEach(function(rel){
-          if(rel.uuid == that.uuid){
-            let obj = {};
-            obj.alias = val.value;
-            obj.status = val.key;
-            obj.time = "";
-            obj.value = "";
-            rel.data.push(obj);
-            obj.uuid = that.uuid;
-            let o = [];
-            console.log()
-            if(!sessionStorage.obj){
-              o.push(obj);
-            } else {
-               o = JSON.parse(sessionStorage.obj);
-              
-              o.push(obj);
-            }
-            sessionStorage.obj = JSON.stringify(o);
-          }
-        })
-        console.log(JSON.parse(sessionStorage.obj))
       }
     }
   }
