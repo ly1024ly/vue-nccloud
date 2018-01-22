@@ -1,6 +1,10 @@
 
   .detail{
     margin:0px;
+    .el-button.el-button--primary{
+      background:orange;
+      border:none;
+    }
     .el-dialog__body select{
       padding:10px;
       border-radius:5px;
@@ -21,7 +25,7 @@
       display:flex;
       flex-wrap: wrap;
       .box-card{
-        width:380px;
+        width:375px;
         height:160px;
         margin:15px;
         text-align:center;

@@ -152,9 +152,10 @@ import Cookies from 'js-cookie'
   		}
 	  },
     mounted(){
-        console.log(document.cookie)
+        console.log(typeof(Cookies.get('locale')))
       let lang = Cookies.get('locale');
-      if(lang=="zh-CN"){
+      
+      if(lang===undefined||lang=="zh-CN"){
           this.language = "中文";
           this.$i18n.locale = 'zh-CN';
       }else{
@@ -185,7 +186,6 @@ import Cookies from 'js-cookie'
         this.title = value;
       },
       changeLang(command){
-
         this.$i18n.locale = command;
         Cookies.set('locale',command);
         if(command=="zh-CN"){

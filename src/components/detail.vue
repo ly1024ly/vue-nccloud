@@ -23,7 +23,7 @@
       <select v-model="selected" v-show="add">
         <option v-for="(item,index) in li" :key="index" :value="item">{{item.value}}</option>
       </select>
-      <div v-show="!add">确定要删除次参数吗?</div>
+      <div v-show="!add">确定要删除此参数吗?</div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveParam()" v-show="add">确 定</el-button>
@@ -65,8 +65,9 @@ import Cookies from 'js-cookie'
         yester:{},
         innerCard:[],
         li:[],
+        alias:'',
         delete:{},
-        selected:'选择内容',
+        selected:'',
         dialogVisible: false,
         echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency","WHstatus_Error"]
       }
@@ -98,6 +99,8 @@ import Cookies from 'js-cookie'
       ...mapMutations(['CHANGEALIAS']),
       handleCommand(command) {
         this.uuid = command.uuid;
+        this.alias = command.alias;
+        console.log(command)
         this.yesterEffi();
         this.$emit("title",command.alias)
       },
@@ -111,10 +114,14 @@ import Cookies from 'js-cookie'
           val:this.delete.status,
           uuid:this.uuid
         }
-        console.log(this.delete)
+        let that = this;
         api.rmParameter(value)
           .then(function(rel){
-            console.log(rel)
+            if(rel.data.result=="success"){
+              console.log(rel)
+              that.dialogVisible = false;
+              
+            }
           })
       },
       saveParam(){
@@ -124,32 +131,36 @@ import Cookies from 'js-cookie'
           uuid:this.uuid
         }
         let val = this.selected;
+        console.log(val)
         let that = this;
-        api.creatSaveMachineParameter(value)
-          .then(function(rel){
-          console.log(rel)
-            if(rel.data.result == "success"){
-              that.innerText.forEach(function(rel){
-                if(rel.uuid == that.uuid){
-                  let obj = {};
-                  obj.alias = val.value;
-                  obj.status = val.key;
-                  obj.time = "";
-                  obj.value = "";
-                  rel.data.push(obj);
-                  obj.uuid = that.uuid;
-                  let o = [];
-                  if(!localStorage.obj){
-                    o.push(obj);
-                  } else {
-                     o = JSON.parse(localStorage.obj);
-                    o.push(obj);
+        if(val!==""){
+          api.creatSaveMachineParameter(value)
+            .then(function(rel){
+            console.log(rel)
+              if(rel.data.result == "success"){
+                that.innerText.forEach(function(rel){
+                  if(rel.uuid == that.uuid){
+                    let obj = {};
+                    obj.alias = val.value;
+                    obj.status = val.key;
+                    obj.time = "";
+                    obj.value = "";
+                    rel.data.push(obj);
+                    obj.uuid = that.uuid;
+                    let o = [];
+                    if(!localStorage.obj){
+                      o.push(obj);
+                    } else {
+                       o = JSON.parse(localStorage.obj);
+                      o.push(obj);
+                    }
+                    localStorage.obj = JSON.stringify(o);
                   }
-                  localStorage.obj = JSON.stringify(o);
-                }
-              })
-            }
-          })
+                });
+                that.allmachinedropList({uuid:that.uuid})
+              }
+            })
+          }
       },
       feedVSstyle(msg){
         var t = msg * 60 + " ";
@@ -229,6 +240,7 @@ import Cookies from 'js-cookie'
               }
               this.yester = o;
             }else{
+            //没有数据的情况；
               let val = [{status:"Estop",time:0},{status:"Idle",time:0},{status:"Running",time:0},{status:"Offline",time:1}]
               this.yester = {
                 uuid:this.uuid ? this.uuid : this.$route.query.uuid,
@@ -241,6 +253,7 @@ import Cookies from 'js-cookie'
       paramSelect(value){
       },
       detailMqtt(uuid){
+        console.log("pppp")
         let pass = md5("ly1024");
         let ar = [];
         var _this = this;
@@ -435,6 +448,16 @@ import Cookies from 'js-cookie'
           })
         })
       },
+      //拉去下拉框参数列表
+      allmachinedropList(res){
+        let that = this;
+        api.addMachineParameters(res)
+          .then(function(res){
+            if(res.data.result=="success"){
+              that.li = res.data.value;
+            }
+          })
+      },
       getMachineData(obj){
         api.machineParameterList(obj)
           .then(res => {
@@ -442,7 +465,6 @@ import Cookies from 'js-cookie'
             if(res.data.result=="success"){
               let that = this;
               this.machineParameterList = res.data.value.params;
-              console.log(this.machineParameterList)
             }
           });
         
@@ -460,6 +482,7 @@ import Cookies from 'js-cookie'
     mounted(){
       this.$emit("success","success");
       this.uuid = this.$route.query.uuid;
+      this.alias = this.$route.query.alias;
       var _this = this;
       this.handleCommand(this.$route.query.alias);
       let obj = {};
@@ -502,12 +525,7 @@ import Cookies from 'js-cookie'
             that.innerCard = o.data;
           }
         })
-        api.addMachineParameters({uuid:this.uuid})
-          .then(function(res){
-            if(res.data.result=="success"){
-              that.li = res.data.value;
-            }
-          })
+        this.allmachinedropList({uuid:this.uuid})
       },
       innerText(val){
         var that = this;
@@ -515,6 +533,9 @@ import Cookies from 'js-cookie'
       },
       mqtts:function(val){
         
+      },
+      alias:function(val){
+        this.alias = val
       },
       selected:function(val){
       }

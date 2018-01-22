@@ -216,7 +216,11 @@ import echart from './echart.vue'
           if(value !== null &&value) {
             
           }
-        } else if(name == 'WHstatus_Error') {}
+        } else if(name == 'WHstatus_Error') {
+
+        } else if(value==''){
+           val = '****';
+        }
         return val
        } 
     },

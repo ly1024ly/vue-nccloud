@@ -129,7 +129,7 @@ export const machineParameterList = param => {
   return get(`${Interface.getHomeParameters}/?username=${user.username}&uuid=${param.uuid}&token=${user.token}`)
 }
 
-export const allMachineDropList = param => {
+export const allMachineDropList = () => {
   return get(`${Interface.allMachines}?username=${user.username}&openid=${user.openid}&token=${user.token}`)
 }
 
@@ -157,5 +157,5 @@ export const rmParameter = param => {
     username:user.username,
     param:param.val
   }  
-  return del(`${Interface.rmParameters}?token=${user.token}&uuid=${param.uuid}&username=${user.username}&param=${param.val}`)
+  return del(`${Interface.rmParameters}?token=${user.token}`,obj)
 }
