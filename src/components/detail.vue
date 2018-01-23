@@ -9,10 +9,10 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
-      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item"></card>
-      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard"></card>
+      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item" :icon="false"></card>
+      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard" :icon="true"></card>
       <el-card class="box-card"  @click="dialogVisible = true">
-        <el-button type="text"  @click="dialogVisible = true"><i class="el-icon-circle-plus" ></i></el-button>
+        <el-button type="text"  @click="dialogVisible = true;add=true"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
     </div>
     <el-dialog
@@ -120,7 +120,7 @@ import Cookies from 'js-cookie'
             if(rel.data.result=="success"){
               console.log(rel)
               that.dialogVisible = false;
-              
+              that.getMachineData({uuid:that.uuid});
             }
           })
       },
@@ -138,25 +138,7 @@ import Cookies from 'js-cookie'
             .then(function(rel){
             console.log(rel)
               if(rel.data.result == "success"){
-                that.innerText.forEach(function(rel){
-                  if(rel.uuid == that.uuid){
-                    let obj = {};
-                    obj.alias = val.value;
-                    obj.status = val.key;
-                    obj.time = "";
-                    obj.value = "";
-                    rel.data.push(obj);
-                    obj.uuid = that.uuid;
-                    let o = [];
-                    if(!localStorage.obj){
-                      o.push(obj);
-                    } else {
-                       o = JSON.parse(localStorage.obj);
-                      o.push(obj);
-                    }
-                    localStorage.obj = JSON.stringify(o);
-                  }
-                });
+                that.getMachineData({uuid:that.uuid});
                 that.allmachinedropList({uuid:that.uuid})
               }
             })
@@ -425,6 +407,20 @@ import Cookies from 'js-cookie'
           "item": '+'
         }]);
       },
+      delParam(key){
+        let innerText = this.innerText;
+        for(var i in innerText){
+          if(innerText[i].uuid = this.uuid){
+            let newArr = [];
+            innerText[i].data.forEach(function(da){
+              if(da.status == key){
+                newArr.push(da)
+              }
+            })
+            innerText[i].data = newArr;
+          }
+        }
+      },
       addParam(arr){
         let that = this;
         this.innerText.forEach(function(it){
@@ -464,6 +460,7 @@ import Cookies from 'js-cookie'
             //获取设备参数
             if(res.data.result=="success"){
               let that = this;
+              console.log(res)
               this.machineParameterList = res.data.value.params;
             }
           });
@@ -533,6 +530,15 @@ import Cookies from 'js-cookie'
       },
       mqtts:function(val){
         
+      },
+      machineParameterList:function(val){
+        console.log(val)
+        let that = this;
+        val.forEach(function(a){
+          if(a.value!==null){
+            that.delParam(a.key)
+          }
+        })
       },
       alias:function(val){
         this.alias = val

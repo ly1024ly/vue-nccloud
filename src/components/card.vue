@@ -1,7 +1,7 @@
 <template>
   <div class="card" >
     <el-card class="box-card" >
-      <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}">
+      <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}" v-show="show">
         <div class="stat" v-for="(it,indexs) in arr" :key="indexs">
           <div v-if="mqtuuid&&it.uuid==item.uuid">
             <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}" v-show="show"></span>
@@ -16,6 +16,7 @@
           <div class="pres" v-show="show">加工进度</div>
           <div class="val" v-for="(it,indexs) in process" v-if="it.uuid==item.uuid" :key="indexs" v-text:msg="textVal(it)">{{msg}}</div>
         </div>
+        </router-link>
         <div v-show="!show" >
           <div class="uuid" >{{item.alias}}</div>
           <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
@@ -41,7 +42,6 @@
         </div>
         <div>
         </div>
-      </router-link>
     </el-card>
   </div>
 </template>
@@ -54,7 +54,7 @@
 import {mapState} from 'vuex'
 import echart from './echart.vue'
   export default{
-    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState"],
+    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon"],
     data(){
       return {
         msg:"",
@@ -64,11 +64,11 @@ import echart from './echart.vue'
         state:'',
         runData:[],
         echart:false,
-        icon:false,
         ExecStateState:this.WHstatus_ExecState
       }
     },
     mounted(){
+      console.log(this.a)
         if(this.allMqttStatus){
         //如果是设备详情8个设备参数
           this.arr = this.allMqttStatus;
@@ -84,6 +84,7 @@ import echart from './echart.vue'
         //echarts图表里的参数
           this.show = false;
         }
+      
     },
     components:{
       echart
