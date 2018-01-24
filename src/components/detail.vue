@@ -69,7 +69,7 @@ import Cookies from 'js-cookie'
         delete:{},
         selected:'',
         dialogVisible: false,
-        echartsMqtt:["WHstatus_ExecState","WHstatus_FeedV","WHstatus_Efficiency","WHstatus_Error"]
+        echartsMqtt:["WHstatus_ExecState","WHstatus_Timeline","WHstatus_Efficiency","WHstatus_Error"]
       }
     },
     components:{

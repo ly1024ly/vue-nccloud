@@ -27,8 +27,22 @@
           <div v-show="!echart" class="state" v-bind:style="{backgroundColor:bgcolor}" v-if="ExecState">{{state}}</div>
           <div v-show="!echart" class="val">开始时间:{{item.time}}</div>
         </div>
-        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_FeedV'? true : false">
-          <div>{{item}}</div>
+        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Timeline'? true : false">
+          <div class="pres">运行日志</div>
+          <div class="log">
+            <div class="first"></div>
+            <div class="second"></div>
+            <div class="third"></div>
+            <div class="fourth" v-html="timelineStyle">
+              {{timelineStyle}}
+            </div>
+          </div>
+          <div class="container_s">
+            <div class="first_div">0:00</div>
+            <div class="second_div">8:00</div>
+            <div class="third_div">16:00</div>
+            <div class="fouth_div">24:00</div>
+          </div>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency'? true : false">
           <echart :option="setOptions(item)"  :id="item.status"></echart>
@@ -66,6 +80,7 @@ import echart from './echart.vue'
         runData:[],
         echart:false,
         wh_error:[],
+        line:"",
         ExecStateState:this.WHstatus_ExecState
       }
     },
@@ -99,6 +114,19 @@ import echart from './echart.vue'
           }
         })
       },
+      timelineStyle(){
+        console.log(this.item)
+        let values = this.timeLineMethods(this.item);
+        var machine_width = 335;
+        var html ="";
+        for(var i = 0; i < values.length; i++) {
+          var sIndex = values[i].time / (24 * 60 * 60) * machine_width;
+          var sL = values[i]._timeStamp / (24 * 60 * 60) * machine_width;
+          var sColor = this.getcolor(values[i]._value);
+          html += "<div class='time_line_item'  style='background:" + sColor + ";height: 14px;position:absolute;top:0;left:" + sIndex + "px;width:" + sL + "px;'>" + "</div>";        
+        }
+        return html
+      },
       warning(){
         if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status == 'WHstatus_Error'){
           let that = this;
@@ -124,7 +152,6 @@ import echart from './echart.vue'
           })
           let set = new Set(arr)
           this.wh_error = Array.from(set);
-          console.log(this.wh_error)
           return true
         }
       },
@@ -170,9 +197,92 @@ import echart from './echart.vue'
           return true
         }
       },
+      getcolor(execstatus) {
+        var color = 'gray';
+        if(execstatus == "Running") {
+          color = "#00BA00";
+        } else if(execstatus == "Idle") {
+          color = "#FFD900";
+        } else if(execstatus == "Estop") {
+          color = "#FF2609";
+        }
+        return color;
+      },
       removeCard(rel){
         this.$emit("remove",rel)
       },
+      timeLineMethods(g_timeline){
+          var newObj = {
+            "value": []
+          };
+          var compare = function(obj1, Obj2) {
+            var val1 = obj1._timeStamp;
+            var val2 = Obj2._timeStamp;
+            if(val1 < val2) {
+              return -1;
+            } else if(val1 > val2) {
+              return 1
+            } else {
+              return 0;
+            }
+          }
+          //把当前的时间戳压进去,
+          var current = new Date().getTime() + 8 * 60 * 60 * 1000;
+          //然后转化为东八区，当前的时间;
+          var currents = new Date(current).toISOString();
+          currents = currents.substring(0, 19);
+          var b = {
+            "_timeStamp": currents,
+            "_value": ""
+          }
+          g_timeline.value.push(b);
+          var sortObj = g_timeline.value.sort(compare);
+          //判断是否在同一天
+          var data1 = g_timeline.value[0]._timeStamp.substring(0, 10);
+          var data2 = g_timeline.value[g_timeline.value.length - 1]._timeStamp.substring(0, 10);
+          //让不在一天以内的时间，统一到在一天以内，删除那些不在一天以内的元素；
+          for(var i = g_timeline.value.length - 1; i >= 0; i--) {
+            if(data2 !== g_timeline.value[i]._timeStamp.substring(0, 10)) {
+              var status = g_timeline.value[i]._value;
+              g_timeline.value.splice(0, i + 1)
+              zero = data2 + "T" + "00:00:00";
+              var a = {
+                "_timeStamp": zero,
+                "_value": status
+              }
+              g_timeline.value.unshift(a);
+              break;
+            }
+            if(i == 0) {
+              var zeros = data2 + "T" + "00:00:00";
+              var b = {
+                "_timeStamp": zeros,
+                "_value": status
+              }
+              g_timeline.value.unshift(b);
+            }
+          }
+          //==========================
+          var time_diff1, time_diff2;
+          //把数组的时间差放进数组对象里；
+          for(var i = 0; i < g_timeline.value.length - 1; i++) {
+            var _1 = g_timeline.value[i];
+            var _2 = g_timeline.value[i + 1];
+            time_diff1 = new Date(_1._timeStamp).getTime() / 1000;
+            //获取数组的第一个时间的毫秒数；
+            var obj0 = new Date(g_timeline.value[0]._timeStamp).getTime() / 1000;
+            time_diff2 = new Date(_2._timeStamp).getTime() / 1000;
+            var obj2 = {
+              "_timeStamp": time_diff2 - time_diff1,
+              "_value": _1._value,
+              "time": time_diff1 - obj0
+            }
+            newObj.value.push(obj2)
+          }
+          //动态生成=============================
+          return newObj.value
+          newObj.value = [];
+      }, 
       setOptions(item){
         let obj = {};
         if(item.status=="WHstatus_Efficiency"){
