@@ -4,7 +4,7 @@
       <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}" v-show="show">
         <div class="stat" v-for="(it,indexs) in arr" :key="indexs">
           <div v-if="mqtuuid&&it.uuid==item.uuid">
-            <span v-if="it.value=='Running'&&it.status=='WHstatus_ExecState'" :style="{background:'green'}" v-show="show"></span>
+            <span v-if="running(it)" :style="{background:'green'}" v-show="show"></span>
             <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}" v-show="show"></span>
             <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}" v-show="show"></span>
             <span v-else="it.status=='WHstatus_ExecState'" :style="{background:'gray'}" v-show="show"></span>
@@ -36,9 +36,10 @@
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency_yester'? true : false">
           <echart :option="setOptions(item)"  :id="item.status"></echart>
         </div>
-        <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Error'? true : false">
+        <div v-else-if="warning">
           <div class="uuid">消息报警</div>
-          <div>{{item.value}}</div>
+          <div v-for="(item,index) in wh_error" :key="index">{{item.value}}</div>
+          
         </div>
         <div>
         </div>
@@ -54,7 +55,7 @@
 import {mapState} from 'vuex'
 import echart from './echart.vue'
   export default{
-    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon"],
+    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon","euuid"],
     data(){
       return {
         msg:"",
@@ -64,6 +65,7 @@ import echart from './echart.vue'
         state:'',
         runData:[],
         echart:false,
+        wh_error:[],
         ExecStateState:this.WHstatus_ExecState
       }
     },
@@ -75,7 +77,6 @@ import echart from './echart.vue'
         //生产监控里的页面
           this.show = false;
         //删除icon
-          this.icon = true;
         }else if(this.mqtuuid){
         //当传来的是生产监控页面时的
           this.arr = this.mqtuuid;
@@ -97,6 +98,35 @@ import echart from './echart.vue'
             return true
           }
         })
+      },
+      warning(){
+        if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status == 'WHstatus_Error'){
+          let that = this;
+          let arr = [];
+          this.allMqttStatus.forEach(function(val){
+            if(val.uuid == that.euuid){
+              val.data.forEach(function(data){
+                if(data.status == "WHstatus_Warning"){
+                  let obj = {
+                    value:data.value,
+                    time:data.time
+                  }
+                  arr.push(obj)
+                }else if(data.status == "WHstatus_Error"){
+                  let obj = {
+                    value:data.value,
+                    time:data.time
+                  }
+                  arr.push(obj)               
+                }
+              })
+            }
+          })
+          let set = new Set(arr)
+          this.wh_error = Array.from(set);
+          console.log(this.wh_error)
+          return true
+        }
       },
       ExecState:function(){
         if(this.WHstatus_ExecState&&this.WHstatus_ExecState.status=="WHstatus_ExecState"){
@@ -132,6 +162,12 @@ import echart from './echart.vue'
           return it.uuid == item.uuid
         }else if(this.allMqttStatus){
           return it.status = item.status;
+        }
+      },
+      running(it){
+        console.log(it)
+        if(it.value=='Running'&&it.status=='WHstatus_ExecState'||Number(it.value)!==NaN){
+          return true
         }
       },
       removeCard(rel){
@@ -233,6 +269,9 @@ import echart from './echart.vue'
       },
       item:function(val){
 
+      },
+      mqtuuid:function(val){
+        console.log(val)
       },
       allMqttStatus:function(val){
         console.log(val)

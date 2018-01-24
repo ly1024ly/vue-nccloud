@@ -9,7 +9,7 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
-      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :item="item" :icon="false"></card>
+      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :allMqttStatus="allMqttStatus" :item="item" :icon="false" :euuid="uuid"></card>
       <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard" :icon="true"></card>
       <el-card class="box-card"  @click="dialogVisible = true">
         <el-button type="text"  @click="dialogVisible = true;add=true"><i class="el-icon-circle-plus" ></i></el-button>
@@ -83,6 +83,7 @@ import Cookies from 'js-cookie'
         let that = this;
         this.allMqttStatus.filter(t => {
           if(t.uuid==that.uuid){
+            let value = [];
             t.data.forEach(function(data){
               that.echartsMqtt.forEach(function(val){
                 if(val==data.status){
@@ -121,6 +122,7 @@ import Cookies from 'js-cookie'
               console.log(rel)
               that.dialogVisible = false;
               that.getMachineData({uuid:that.uuid});
+              that.allmachinedropList({uuid:that.uuid})
             }
           })
       },
@@ -496,15 +498,6 @@ import Cookies from 'js-cookie'
      
     },
     watch:{
-      mqtts:function(ar){
-        
- 
-      },
-      allMqttStatus:function(value){
-      },
-      WHstatus:function(value){
-        
-      },
       uuid:function(val){
         let obj = {};
         obj.username = "ly1024";
@@ -528,9 +521,6 @@ import Cookies from 'js-cookie'
         var that = this;
         console.log(val)
       },
-      mqtts:function(val){
-        
-      },
       machineParameterList:function(val){
         console.log(val)
         let that = this;
@@ -543,8 +533,6 @@ import Cookies from 'js-cookie'
       alias:function(val){
         this.alias = val
       },
-      selected:function(val){
-      }
     }
   }
 </script>

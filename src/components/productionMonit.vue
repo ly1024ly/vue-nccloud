@@ -162,7 +162,7 @@ import card from './card.vue';
     },
     watch:{
       mqtt:function(value){
-          console.log(value)
+          //console.log(value)
       },
       mqtuuid(value){
         console.log(value)
