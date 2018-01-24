@@ -21,6 +21,7 @@
           <div class="uuid" >{{item.alias}}</div>
           <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
           <div class="val" v-show="!echart">{{textVal(item)}}</div>
+          <i v-if="item.alias=='进给速度'" class="el-icon-zoom-in" @click="feedv(item)"></i>
           <i class="el-icon-remove" v-show="icon" v-if="item.status!=='WHstatus_ExecState'" @click="removeCard(item)"></i>
         </div>
         <div v-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_ExecState'">
@@ -85,7 +86,6 @@ import echart from './echart.vue'
       }
     },
     mounted(){
-      console.log(this.a)
         if(this.allMqttStatus){
         //如果是设备详情8个设备参数
           this.arr = this.allMqttStatus;
@@ -115,7 +115,6 @@ import echart from './echart.vue'
         })
       },
       timelineStyle(){
-        console.log(this.item)
         let values = this.timeLineMethods(this.item);
         var machine_width = 335;
         var html ="";
@@ -191,9 +190,14 @@ import echart from './echart.vue'
           return it.status = item.status;
         }
       },
+      feedv(val){
+        this.$emit("showFeedv",true)
+      },
       running(it){
-        console.log(it)
-        if(it.value=='Running'&&it.status=='WHstatus_ExecState'||Number(it.value)!==NaN){
+        
+        var reg = /^[0-9]+.?[0-9]*$/;
+        let result = reg.test(it.value);
+        if(it.value=='Running'&&it.status=='WHstatus_ExecState'||result){
           return true
         }
       },
@@ -312,6 +316,8 @@ import echart from './echart.vue'
             arr.push(o)
           }
         }
+        obj.type = "pie";
+        obj.name = "加工效率分析";
         obj.data = arr;
         return obj
       },
@@ -381,10 +387,9 @@ import echart from './echart.vue'
 
       },
       mqtuuid:function(val){
-        console.log(val)
+        
       },
       allMqttStatus:function(val){
-        console.log(val)
       }
     }
   }

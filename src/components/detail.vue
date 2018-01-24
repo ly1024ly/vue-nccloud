@@ -1,5 +1,8 @@
 <template>
   <div class="detail">
+    <div class="zaochen" v-show="zaochen" @click="hiddeFeedv">
+      <echart :option="lineFeedv" id="text" :parentStyle="feedvStyle"></echart>
+    </div>
     <el-dropdown  @command="handleCommand">
       <span class="el-dropdown-link">
         {{ $t("message.select") }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -10,7 +13,7 @@
     </el-dropdown>
     <div class="card-content">
       <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :allMqttStatus="allMqttStatus" :item="item" :icon="false" :euuid="uuid"></card>
-      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard" :icon="true"></card>
+      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard" :icon="true" v-on:showFeedv="getFeedv"></card>
       <el-card class="box-card"  @click="dialogVisible = true">
         <el-button type="text"  @click="dialogVisible = true;add=true"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
@@ -66,10 +69,13 @@ import Cookies from 'js-cookie'
         innerCard:[],
         li:[],
         alias:'',
+        zaochen:false,
         delete:{},
         selected:'',
+        feedv:[],
         dialogVisible: false,
-        echartsMqtt:["WHstatus_ExecState","WHstatus_Timeline","WHstatus_Efficiency","WHstatus_Error"]
+        echartsMqtt:["WHstatus_ExecState","WHstatus_Timeline","WHstatus_Efficiency","WHstatus_Error"],
+        feedvStyle:{}
       }
     },
     components:{
@@ -94,6 +100,19 @@ import Cookies from 'js-cookie'
           }
         });
         return arr
+      },
+      lineFeedv(){
+          return {
+              type:"line"
+          }
+      },
+      computStyle(){
+          let width = window.screen.width*0.8 + "px";
+          let height = "80vh";
+          return {
+              width:width,
+              height:height
+          }
       }
     },
     methods:{
@@ -125,6 +144,14 @@ import Cookies from 'js-cookie'
               that.allmachinedropList({uuid:that.uuid})
             }
           })
+      },
+      getFeedv(val){
+        if(val){
+          this.zaochen = true;
+        }
+      },
+      hiddeFeedv(){
+        this.zaochen = false;
       },
       saveParam(){
         this.dialogVisible = false;
@@ -322,6 +349,7 @@ import Cookies from 'js-cookie'
                   }       
                 }
               };
+
               _this.addParam(_this.machineParameterList)
               _this.innerText.forEach(function(o){
                 if(o.uuid==_this.uuid){
@@ -400,7 +428,33 @@ import Cookies from 'js-cookie'
                       _this.allMqttStatus.push(param);
                     }
 
-              }       
+              } 
+             
+              //进给速度
+              if(ar[1] == "WHstatus_FeedV"){
+                if(_this.feedv.length==0){
+                  let feed = {};
+                  let obj = {};
+                  let arr = [];
+                  feed.uuid = ar[0];
+                  obj.status = ar[1];
+                  obj.value = ar[2];
+                  obj.time = ar[3];
+                  arr.push(obj);
+                  feed.data = arr;
+                  _this.feedv.push(feed);
+                }else{
+                  _this.feedv.forEach(function(val){
+                    if(val.uuid == ar[0]){
+                      let obj = {};
+                      obj.status = ar[1];
+                      obj.value = ar[2];
+                      obj.time = ar[3];
+                      val.data.push(obj)
+                    }
+                  })
+                }
+              }     
             _this.mqtts = ar;
         })
         detailMqtt.connect([{
@@ -462,7 +516,6 @@ import Cookies from 'js-cookie'
             //获取设备参数
             if(res.data.result=="success"){
               let that = this;
-              console.log(res)
               this.machineParameterList = res.data.value.params;
             }
           });
@@ -477,7 +530,14 @@ import Cookies from 'js-cookie'
           .catch(_ => {});
       }
     },
-
+    created(){
+      let width = window.screen.width*0.8 + "px";
+      let height = window.screen.height*0.6 + "px";
+      this.feedvStyle = {
+          width:width,
+          height:height
+      };
+    },
     mounted(){
       this.$emit("success","success");
       this.uuid = this.$route.query.uuid;
@@ -517,12 +577,16 @@ import Cookies from 'js-cookie'
         })
         this.allmachinedropList({uuid:this.uuid})
       },
+      mqtts(val){
+
+      },
       innerText(val){
         var that = this;
-        console.log(val)
+      },
+      feedv(val){
+        
       },
       machineParameterList:function(val){
-        console.log(val)
         let that = this;
         val.forEach(function(a){
           if(a.value!==null){

@@ -1,5 +1,6 @@
 $center:center;
 $color:#333;
+$scale:scale(1.4);
 .card{
   position:relative;
   .text {
@@ -13,7 +14,13 @@ $color:#333;
     right:20px;
   }
   .el-icon-remove:hover{
-    transform: scale(1.4);  
+    transform: $scale;  
+  }
+  .el-icon-zoom-in{
+    position:absolute;
+    left:20px;
+    bottom:20px;
+    font-size:20px;
   }
   .item {
     padding: 18px 0;
@@ -40,7 +47,6 @@ $color:#333;
         display: -ms-flexbox;
         display: flex;
         position: relative;
-        border: 1px solid #aaa;
         .first {
           position: absolute;
           left: -1px;
