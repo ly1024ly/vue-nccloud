@@ -2,14 +2,21 @@
   .detail{
     margin:0px;
     .zaochen{
-      width:100%;
+      width:-webkit-calc(100% - 60px);
+      width:-moz-calc(100% - 60px);
+      width: -ms-calc(100% - 60px);
+      width: calc(100% - 60px);
+      padding:30px;
       height:100vh;
-      background:rgba(225,225,225,0.9);
+      background:rgba(225,225,225,0.95);
       position:fixed;
       top:0px;
       left:0px;
       z-index:12;
-      
+      text-align:right;
+      .el-icon-circle-close-outline{
+        font-size:40px;
+      }
     }
     .el-button.el-button--primary{
       background:orange;

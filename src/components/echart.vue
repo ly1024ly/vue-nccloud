@@ -21,79 +21,95 @@
       }
     },
     methods:{
-      drawLineGraph(id){
+      drawLineGraph(id,data){
         this.chart = echarts.init(document.getElementById(id));
+        console.log("&&&&&&&&&&&&&echart&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        console.log(data)
         this.chart.setOption({
-    title : {
-        text: '未来一周气温变化',
-        subtext: '纯属虚构'
-    },
-    tooltip : {
-        trigger: 'axis'
-    },
-    legend: {
-        data:['最高气温','最低气温']
-    },
-    toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
-    },
-    calculable : true,
-    xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['周一','周二','周三','周四','周五','周六','周日']
-        }
-    ],
-    yAxis : [
-        {
-            type : 'value',
-            axisLabel : {
-                formatter: '{value} °C'
-            }
-        }
-    ],
-    series : [
-        {
-            name:'最高气温',
-            type:'line',
-            data:[11, 11, 15, 13, 12, 13, 10],
-            markPoint : {
-                data : [
-                    {type : 'max', name: '最大值'},
-                    {type : 'min', name: '最小值'}
-                ]
+            title: {
+                text: 'Beijing AQI'
             },
-            markLine : {
-                data : [
-                    {type : 'average', name: '平均值'}
-                ]
-            }
-        },
-        {
-            name:'最低气温',
-            type:'line',
-            data:[1, -2, 2, 5, 3, 2, 0],
-            markPoint : {
-                data : [
-                    {name : '周最低', value : -2, xAxis: 1, yAxis: -1.5}
-                ]
+            tooltip: {
+                trigger: 'axis'
             },
-            markLine : {
-                data : [
-                    {type : 'average', name : '平均值'}
-                ]
+            xAxis: {
+                data: data.map(function (item) {
+                    return item[0];
+                })
+            },
+            yAxis: {
+                splitLine: {
+                    show: false
+                }
+            },
+            toolbox: {
+                left: 'center',
+                feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            dataZoom: [{
+                startValue: '2014-06-01'
+            }, {
+                type: 'inside'
+            }],
+            visualMap: {
+                top: 10,
+                right: 10,
+                pieces: [{
+                    gt: 0,
+                    lte: 4,
+                    color: '#096'
+                }, {
+                    gt: 4,
+                    lte: 8,
+                    color: '#ffde33'
+                }, {
+                    gt: 8,
+                    lte: 12,
+                    color: '#ff9933'
+                }, {
+                    gt: 12,
+                    lte: 16,
+                    color: '#cc0033'
+                }, {
+                    gt: 16,
+                    lte: 20,
+                    color: '#660099'
+                }, {
+                    gt: 20,
+                    color: '#7e0023'
+                }],
+                outOfRange: {
+                    color: '#999'
+                }
+            },
+            series: {
+                name: 'Beijing AQI',
+                type: 'line',
+                data: data.map(function (item) {
+                    return item[1];
+                }),
+                markLine: {
+                    silent: true,
+                    data: [{
+                        yAxis: 4
+                    }, {
+                        yAxis: 8
+                    }, {
+                        yAxis: 12
+                    }, {
+                        yAxis: 16
+                    }, {
+                        yAxis: 20
+                    }]
+                }
             }
-        }
-    ]
-})
+        })
       },
       drawPieGraph(id,data) { 
         var that = this;
@@ -163,18 +179,17 @@
       if(this.option.type == "pie"){
         this.drawPieGraph(this.id,this.option);
       }else if(this.option.type == "line"){
-            this.drawLineGraph(this.id);
+            this.drawLineGraph(this.id,this.option.data);
       }
     },
     watch:{
       option:function(value){
         this.data = value;
-        console.log(value)
         if(value.type=="pie"){
             this.drawPieGraph(this.id,value);
         }
         if(value.type=="line"){
-            this.drawLineGraph(this.id);
+            this.drawLineGraph(this.id,value.data);
         }
       },
       num:function(val){

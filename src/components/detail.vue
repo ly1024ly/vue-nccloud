@@ -1,6 +1,7 @@
 <template>
   <div class="detail">
-    <div class="zaochen" v-show="zaochen" @click="hiddeFeedv">
+    <div class="zaochen" v-show="zaochen" >
+      <i class="el-icon-circle-close-outline" @click="hiddeFeedv"></i>
       <echart :option="lineFeedv" id="text" :parentStyle="feedvStyle"></echart>
     </div>
     <el-dropdown  @command="handleCommand">
@@ -102,17 +103,31 @@ import Cookies from 'js-cookie'
         return arr
       },
       lineFeedv(){
-          return {
-              type:"line"
+        let that = this;
+        let data = [];
+        this.feedv.forEach(function(val){
+          if(val.uuid == that.uuid){
+            val.data.forEach(function(dd){
+              let arr = [];
+              arr.push(dd.time);
+              arr.push(dd.value);
+              console.log(dd)
+              data.push(arr)
+            })
           }
+        })
+        return {
+            type:"line",
+            data:data
+        }
       },
       computStyle(){
-          let width = window.screen.width*0.8 + "px";
-          let height = "80vh";
-          return {
-              width:width,
-              height:height
-          }
+        let width = window.screen.width*0.85 + "px";
+        let height = "80vh";
+        return {
+            width:width,
+            height:height
+        }
       }
     },
     methods:{
@@ -584,7 +599,7 @@ import Cookies from 'js-cookie'
         var that = this;
       },
       feedv(val){
-        
+        console.log(val)
       },
       machineParameterList:function(val){
         let that = this;

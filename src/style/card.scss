@@ -35,8 +35,19 @@ $scale:scale(1.4);
     div.el-card__body{
       padding:10px!important;
       text-align:$center;
+      overflow-y:auto;
       a{
         text-decoration:none;
+      }
+      .mesWarn{
+        height:130px;
+        overflow-y:auto;
+        margin-top:-20px;
+      }
+      .alarm{
+        font-size:14px;
+        border-bottom:1px dashed #c0c4cc;
+        padding:4px 0;
       }
       .log {
         width: 100%;

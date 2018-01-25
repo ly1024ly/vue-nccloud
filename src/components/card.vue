@@ -51,9 +51,9 @@
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Efficiency_yester'? true : false">
           <echart :option="setOptions(item)"  :id="item.status"></echart>
         </div>
-        <div v-else-if="warning">
+        <div v-else-if="warning" class="mesWarn">
           <div class="uuid">消息报警</div>
-          <div v-for="(item,index) in wh_error" :key="index">{{item.value}}</div>
+          <div class="alarm" v-for="(item,index) in wh_error" :key="index">{{item.value}} <span>[{{item.time.split("T").join(" ").slice(0,19)}}]</span></div>
           
         </div>
         <div>
