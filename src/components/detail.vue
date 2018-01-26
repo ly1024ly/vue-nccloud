@@ -111,7 +111,6 @@ import Cookies from 'js-cookie'
               let arr = [];
               arr.push(dd.time);
               arr.push(dd.value);
-              console.log(dd)
               data.push(arr)
             })
           }
@@ -135,7 +134,6 @@ import Cookies from 'js-cookie'
       handleCommand(command) {
         this.uuid = command.uuid;
         this.alias = command.alias;
-        console.log(command)
         this.yesterEffi();
         this.$emit("title",command.alias)
       },
@@ -153,7 +151,6 @@ import Cookies from 'js-cookie'
         api.rmParameter(value)
           .then(function(rel){
             if(rel.data.result=="success"){
-              console.log(rel)
               that.dialogVisible = false;
               that.getMachineData({uuid:that.uuid});
               that.allmachinedropList({uuid:that.uuid})
@@ -175,12 +172,10 @@ import Cookies from 'js-cookie'
           uuid:this.uuid
         }
         let val = this.selected;
-        console.log(val)
         let that = this;
         if(val!==""){
           api.creatSaveMachineParameter(value)
             .then(function(rel){
-            console.log(rel)
               if(rel.data.result == "success"){
                 that.getMachineData({uuid:that.uuid});
                 that.allmachinedropList({uuid:that.uuid})
@@ -279,7 +274,6 @@ import Cookies from 'js-cookie'
       paramSelect(value){
       },
       detailMqtt(uuid){
-        console.log("pppp")
         let pass = md5("ly1024");
         let ar = [];
         var _this = this;
@@ -599,7 +593,6 @@ import Cookies from 'js-cookie'
         var that = this;
       },
       feedv(val){
-        console.log(val)
       },
       machineParameterList:function(val){
         let that = this;

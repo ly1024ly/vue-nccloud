@@ -23,8 +23,6 @@
     methods:{
       drawLineGraph(id,data){
         this.chart = echarts.init(document.getElementById(id));
-        console.log("&&&&&&&&&&&&&echart&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        console.log(data)
         this.chart.setOption({
             title: {
                 text: 'Beijing AQI'
@@ -191,6 +189,7 @@
         if(value.type=="line"){
             this.drawLineGraph(this.id,value.data);
         }
+        console.log(value)
       },
       num:function(val){
         

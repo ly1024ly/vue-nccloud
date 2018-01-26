@@ -165,7 +165,7 @@ import card from './card.vue';
           //console.log(value)
       },
       mqtuuid(value){
-        console.log(value)
+        
       }
     }
   }

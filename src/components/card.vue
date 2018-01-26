@@ -53,7 +53,7 @@
         </div>
         <div v-else-if="warning" class="mesWarn">
           <div class="uuid">消息报警</div>
-          <div class="alarm" v-for="(item,index) in wh_error" :key="index">{{item.value}} <span>[{{item.time.split("T").join(" ").slice(0,19)}}]</span></div>
+          <div class="alarm" v-for="(item,index) in wh_error" :key="index">{{item.value}} <span v-if="item">[{{item.time.split("T").join(" ").slice(0,19)}}]</span></div>
           
         </div>
         <div>
@@ -297,8 +297,12 @@ import echart from './echart.vue'
           obj.status = this.item.status;
         }
         let arr = [];
+        let todayRemain = 0;
         if(item.value!==null&&item.value){
           for(var i = 0;i<item.value.length;i++){
+            if(item.status == "WHstatus_Efficiency"){
+              todayRemain += item.value[i].time;
+            }
             let o = {};
             if(item.value[i].status == "Running"){
               o.name = "加工";
@@ -316,6 +320,15 @@ import echart from './echart.vue'
             arr.push(o)
           }
         }
+        if(todayRemain>0){
+          console.log(todayRemain)
+          let val = 24 * 3600 * 1000 - todayRemain;
+          let o = {
+            name:"剩余时间",
+            value:val
+          }
+          arr.push(o)
+        }
         obj.type = "pie";
         obj.name = "加工效率分析";
         obj.data = arr;
@@ -324,16 +337,18 @@ import echart from './echart.vue'
       textVal(param){
         let name = param.status;
         let value = param.value;
-        let time = param.time;
+        let time = param.time||param.value;
         let val;
         if(name == "WHstatus_TotalCompletedCount") {
           val = value + " 件";
         } else if(name == "WHstatus_ControllerMode") {
           val = value;
         } else if(name == "WHstatus_FeedV") {
-          let ts = time.substr(0, 27);
-          
-          val =  value + "  mm/min";
+          if(time){
+            
+            
+            val =  time + "  mm/min";
+          }
         } else if(name == "WHstatus_SpindleFeedrate") {
           val = value + " %";
         } else if(name == "WHstatus_SpindleSpeed") {
@@ -343,7 +358,7 @@ import echart from './echart.vue'
         } else if(name == "WHstatus_HadCompletedPercent") {
           val = value + "  %";
         } else if(name == "WHstatus_programName") {
-          if(value == '') {
+          if(value == ''||time.value == '') {
             val = '****';
           } else {
             //截取加工文件
@@ -371,7 +386,7 @@ import echart from './echart.vue'
           }
         } else if(name == 'WHstatus_Error') {
 
-        } else if(value==''){
+        } else if(value==''||time == ''){
            val = '****';
         }
         return val
@@ -385,6 +400,9 @@ import echart from './echart.vue'
       },
       item:function(val){
 
+      },
+      process(val){
+        console.log(val)
       },
       mqtuuid:function(val){
         
