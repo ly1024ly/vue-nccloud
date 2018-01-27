@@ -105,7 +105,8 @@ const Interface = {
 const user = {
   username:Cookies.get("username"),
   openid:Cookies.get("openid"),
-  token:Cookies.get("token")
+  token:Cookies.get("token"),
+  vercode:Cookies.get("vercode")
 }
 
 export const userLogin = param => {
@@ -162,4 +163,12 @@ export const rmParameter = param => {
 
 export const getAllMachine = () => {
   return get(`${ Interface.allMachines}?openid=${user.openid}&username=${user.username}&token=${user.token}`)  
+}
+
+export const addMachine =(param) => {
+  return get(`${Interface.homeLists}?username=${user.username}&openid=${user.openid}&uuid=${param}&token=${user.token}`)
+}
+
+export const saveHomeParameter = param => {
+  return put(`${Interface.saveHomeParameters}?username=${user.username}&openid=${user.openid}&uuid=${param.uuid}&item=${param.item}&token=${user.token}`)
 }

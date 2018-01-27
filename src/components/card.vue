@@ -1,9 +1,9 @@
 <template>
   <div class="card" >
     <el-card class="box-card" >
-      <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}" v-show="show">
+      <router-link :to="{path:'detail',query:{uuid:item.uuid,alias:item.alias}}" v-if="productMachine" >
         <div class="stat" v-for="(it,indexs) in arr" :key="indexs">
-          <div v-if="mqtuuid&&it.uuid==item.uuid">
+          <div v-if="cilcle(it,item)">
             <span v-if="running(it)" :style="{background:'green'}" v-show="show"></span>
             <span v-else-if="it.value=='Idle'&&it.status=='WHstatus_ExecState'" :style="{background:'yellow'}" v-show="show"></span>
             <span v-else-if="it.value=='Estop'&&it.status=='WHstatus_ExecState'" :style="{background:'red'}" v-show="show"></span>
@@ -13,10 +13,20 @@
         <div v-show="show">
           <p>{{item.alias}}</p>
           <div class="uuid" >{{item.uuid}}</div>
-          <div class="pres" v-show="show">加工进度</div>
+          <div class="pres" v-show="show" @click="getParamList(item)" >加工进度</div>
           <div class="val" v-for="(it,indexs) in process" v-if="it.uuid==item.uuid" :key="indexs" v-text:msg="textVal(it)">{{msg}}</div>
         </div>
         </router-link>
+        <div v-else-if="show&&all">
+          <div v-show="show">
+            <p>{{item.alias}}</p>
+            <div class="uuid" >{{item.uuid}}</div>
+            <div class="pres all" v-show="show" @click="getParamList(item)" >{{item.param? item.param : selected.value}}</div>
+            <i class="star el-icon-star-on" :class=""></i>
+            <i class="el-icon-remove" v-show="icon" @click="removeCard(item)"></i>
+            <div class="val" v-for="(it,indexs) in process" v-if="it.uuid==item.uuid" :key="indexs" v-text:msg="textVal(it)">{{msg}}</div>
+          </div>
+        </div>
         <div v-show="!show" >
           <div class="uuid" >{{item.alias}}</div>
           <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
@@ -70,7 +80,7 @@
 import {mapState} from 'vuex'
 import echart from './echart.vue'
   export default{
-    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon","euuid","all"],
+    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon","euuid","all","selected"],
     data(){
       return {
         msg:"",
@@ -82,7 +92,7 @@ import echart from './echart.vue'
         echart:false,
         wh_error:[],
         line:"",
-        allshow:true,
+        allshow:false,
         ExecStateState:this.WHstatus_ExecState
       }
     },
@@ -105,7 +115,7 @@ import echart from './echart.vue'
           this.allshow = false;
         }else if(this.all){
           this.arr = this.all;
-          this.show = false;
+          this.show = true;
           this.allshow = true;
         }
       
@@ -121,6 +131,18 @@ import echart from './echart.vue'
             return true
           }
         })
+      },
+      noclick:function(){
+        if(this.all){
+          return "pointer-events: none;"
+        }
+      },
+      productMachine(){
+        if(this.show==true&&this.allshow==false){
+          return true
+        }else{
+          return false
+        }
       },
       timelineStyle(){
         let values = this.timeLineMethods(this.item);
@@ -198,8 +220,19 @@ import echart from './echart.vue'
           return it.status = item.status;
         }
       },
+      getParamList(res){
+
+        if(this.all){
+          this.$emit("chooseParam",res)
+        }
+      },
       feedv(val){
         this.$emit("showFeedv",true)
+      },
+      cilcle:function(it,item){
+        if(this.mqtuuid&&it.uuid==item.uuid&&this.allshow==false){
+          return true
+        }
       },
       running(it){
         var reg = /^[0-9]+.?[0-9]*$/;
@@ -414,10 +447,12 @@ import echart from './echart.vue'
       item:function(val){
 
       },
+      all(val){
+        console.log(val)
+      },
       process(val){
       },
       mqtuuid:function(val){
-        console.log(val)
       },
       allMqttStatus:function(val){
       }
