@@ -70,7 +70,7 @@
 import {mapState} from 'vuex'
 import echart from './echart.vue'
   export default{
-    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon","euuid"],
+    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon","euuid","all"],
     data(){
       return {
         msg:"",
@@ -82,6 +82,7 @@ import echart from './echart.vue'
         echart:false,
         wh_error:[],
         line:"",
+        allshow:true,
         ExecStateState:this.WHstatus_ExecState
       }
     },
@@ -91,14 +92,21 @@ import echart from './echart.vue'
           this.arr = this.allMqttStatus;
         //生产监控里的页面
           this.show = false;
+          this.allshow = false;
         //删除icon
         }else if(this.mqtuuid){
         //当传来的是生产监控页面时的
           this.arr = this.mqtuuid;
           this.show = true;
+          this.allshow = false;
         }else if(this.WHstatus_ExecState){
         //echarts图表里的参数
           this.show = false;
+          this.allshow = false;
+        }else if(this.all){
+          this.arr = this.all;
+          this.show = false;
+          this.allshow = true;
         }
       
     },
@@ -194,12 +202,20 @@ import echart from './echart.vue'
         this.$emit("showFeedv",true)
       },
       running(it){
-        
         var reg = /^[0-9]+.?[0-9]*$/;
         let result = reg.test(it.value);
         if(it.value=='Running'&&it.status=='WHstatus_ExecState'||result){
           return true
         }
+      },
+     feedVSstyle(msg){
+        var t = msg * 60 + " ";
+        var t1 = t.indexOf('.');
+        if(t1 == -1) {
+          t1 = t.length;
+        }
+        var a = t.substr(0, t1);
+        return a;
       },
       getcolor(execstatus) {
         var color = 'gray';
@@ -321,7 +337,6 @@ import echart from './echart.vue'
           }
         }
         if(todayRemain>0){
-          console.log(todayRemain)
           let val = 24 * 3600 * 1000 - todayRemain;
           let o = {
             name:"剩余时间",
@@ -345,9 +360,7 @@ import echart from './echart.vue'
           val = value;
         } else if(name == "WHstatus_FeedV") {
           if(time){
-            
-            
-            val =  time + "  mm/min";
+          val =  this.feedVSstyle(value) + "  mm/min";
           }
         } else if(name == "WHstatus_SpindleFeedrate") {
           val = value + " %";
@@ -402,10 +415,9 @@ import echart from './echart.vue'
 
       },
       process(val){
-        console.log(val)
       },
       mqtuuid:function(val){
-        
+        console.log(val)
       },
       allMqttStatus:function(val){
       }

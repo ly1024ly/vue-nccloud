@@ -159,3 +159,7 @@ export const rmParameter = param => {
   }  
   return del(`${Interface.rmParameters}?token=${user.token}`,obj)
 }
+
+export const getAllMachine = () => {
+  return get(`${ Interface.allMachines}?openid=${user.openid}&username=${user.username}&token=${user.token}`)  
+}

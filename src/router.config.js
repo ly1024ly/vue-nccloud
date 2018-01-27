@@ -5,6 +5,7 @@ import Login from './components/login.vue';
 import Production from './components/productionMonit.vue';
 import Detail from './components/detail.vue';
 import Card from './components/card.vue';
+import AllMachine from './components/AllMachine.vue';
 
 
 const routes =[
@@ -21,7 +22,8 @@ const routes =[
 				],
 				name:'生产监控'
 			},
-			{path:'/detail',component:Detail,name:'设备详情'}
+			{path:'/detail',component:Detail,name:'设备详情'},
+			{path:'/allmachine',component:AllMachine,name:'全部设备'}
 		]
 	},
 	{

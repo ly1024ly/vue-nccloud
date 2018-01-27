@@ -34,12 +34,10 @@
         <i class="el-icon-menu"></i>
         <span slot="title">{{ $t("message.menu2") }}</span>
       </el-menu-item>
-        <router-link to="warning">
-          <el-menu-item index="3">
-            <i class="el-icon-menu"></i>
-            <span slot="title">{{ $t("message.menu3") }}</span>
-          </el-menu-item>
-        </router-link>
+      <el-menu-item index="3" @click="allmachine('allmachine')">
+        <i class="el-icon-menu"></i>
+        <span slot="title">{{ $t("message.menu3") }}</span>
+      </el-menu-item>
         <router-link to="warning">
           <el-menu-item index="4">
             <i class="el-icon-menu"></i>
@@ -219,6 +217,12 @@ import Cookies from 'js-cookie'
         var index = url.lastIndexOf("/");
         var openU = url.slice(0,index); 
         window.open( openU + '/production')
+      },
+      allmachine(res){
+        var url = window.location.href;
+        var index = url.lastIndexOf("/");
+        var openU = url.slice(0,index); 
+        window.open( openU + '/allmachine');       
       },
       asideShow(){
         if(this.class=="el-icon-d-arrow-left"){

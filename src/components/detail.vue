@@ -62,7 +62,6 @@ import Cookies from 'js-cookie'
         add:true,
         process:false,
         allMqttStatus:[],
-        WHstatus_FeedVData:[],
         uuid:this.$route.query.uuid,
         mqtts:[],
         WHstatus:{},
@@ -107,14 +106,20 @@ import Cookies from 'js-cookie'
         let data = [];
         this.feedv.forEach(function(val){
           if(val.uuid == that.uuid){
+            if(val.data.length > 1800){
+              val.data = val.data.slice(500)
+            }
             val.data.forEach(function(dd){
               let arr = [];
-              arr.push(dd.time);
-              arr.push(dd.value);
+              let ts = dd.time.substr(0,27);
+              let value = that.feedVSstyle(dd.value);
+              arr.push(ts);
+              arr.push(value);
               data.push(arr)
             })
           }
         })
+        console.log(data)
         return {
             type:"line",
             data:data
@@ -202,10 +207,6 @@ import Cookies from 'js-cookie'
         } else if(name == "WHstatus_ControllerMode") {
           val = value;
         } else if(name == "WHstatus_FeedV") {
-          let ts = time.substr(0, 27);
-          if(this.WHstatus_FeedVData.length > 1800){
-            this.WHstatus_FeedVData = this.WHstatus_FeedVData.slice(500)
-          }
           
           val =  value + "  mm/min";
         } else if(name == "WHstatus_SpindleFeedrate") {

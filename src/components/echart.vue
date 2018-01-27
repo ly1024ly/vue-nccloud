@@ -189,7 +189,6 @@
         if(value.type=="line"){
             this.drawLineGraph(this.id,value.data);
         }
-        console.log(value)
       },
       num:function(val){
         
