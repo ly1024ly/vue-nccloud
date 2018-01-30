@@ -72,6 +72,7 @@ import Cookies from 'js-cookie'
         zaochen:false,
         delete:{},
         selected:'',
+        fail:"",
         feedv:[],
         dialogVisible: false,
         echartsMqtt:["WHstatus_ExecState","WHstatus_Timeline","WHstatus_Efficiency","WHstatus_Error"],
@@ -119,7 +120,6 @@ import Cookies from 'js-cookie'
             })
           }
         })
-        console.log(data)
         return {
             type:"line",
             data:data
@@ -146,6 +146,17 @@ import Cookies from 'js-cookie'
         this.dialogVisible = true;
         this.add = false;
         this.delete = value;
+      },
+      warning(res) {
+        this.$alert(res, '温馨提示', {
+          confirmButtonText: '确定',
+          callback: action => {
+            this.$message({
+              type: 'info',
+              message: `action: ${ action }`
+            });
+          }
+        });
       },
       removeParam(){
         let value = {
@@ -586,6 +597,8 @@ import Cookies from 'js-cookie'
           }
         })
         this.allmachinedropList({uuid:this.uuid})
+      },
+      selected(val){
       },
       mqtts(val){
 

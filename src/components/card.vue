@@ -30,13 +30,13 @@
         <div v-show="!show" >
           <div class="uuid" >{{item.alias}}</div>
           <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
-          <div class="val" v-show="!echart">{{textVal(item)}}</div>
+          <div class="val" v-show="!echart" v-if="!WHstatus_ExecState">{{textVal(item)}}</div>
           <i v-if="item.alias=='进给速度'" class="el-icon-zoom-in" @click="feedv(item)"></i>
           <i class="el-icon-remove" v-show="icon" v-if="item.status!=='WHstatus_ExecState'" @click="removeCard(item)"></i>
         </div>
         <div v-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_ExecState'">
           <div v-show="!echart" class="state" v-bind:style="{backgroundColor:bgcolor}" v-if="ExecState">{{state}}</div>
-          <div v-show="!echart" class="val">开始时间:{{item.time}}</div>
+          <div v-show="!echart" class="val">开始时间:{{item.time.split("T").join(" ")}}</div>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Timeline'? true : false">
           <div class="pres">运行日志</div>
@@ -114,6 +114,7 @@ import echart from './echart.vue'
           this.show = false;
           this.allshow = false;
         }else if(this.all){
+        //所有设备
           this.arr = this.all;
           this.show = true;
           this.allshow = true;
@@ -414,11 +415,11 @@ import echart from './echart.vue'
         } else if(name == "WHstatus_ExecState") {
           
           if(value == "Running") {
-            
+            val = "运行"
           } else if(value == "Idle") {
-           
+            val = "空闲"
           } else if(value == "Estop") {
-           
+            val = "紧停"
           } else {
             
           }
@@ -434,6 +435,42 @@ import echart from './echart.vue'
 
         } else if(value==''||time == ''){
            val = '****';
+        } else if(name== "WHstatus_CutTime") {
+          val = value + "ms"
+        } else if (name == "WHstatus_Info"){
+          val = value
+        } else if(name == "WHstatus_OilPumpUsedTime") {
+          val = value
+        } else if(name == "WHstatus_SingleTime") {
+          val = value
+        } else if(name == "WHstatus_FilterCartridgeUsedTime") {
+          val = value
+        } else if(name == "WHstatus_RailOilUsedTime"){
+          val = value
+        } else if(name == "WHstatus_HighPressureSealRingUsedTime") {
+          val = value
+        } else if(name == "WHstatus_OilPressureSealRingUsedTime") {
+          val = value
+        } else if(name == "WHstatus_HighPressureUsedTime") {
+          val = value
+        } else if(name == "WHstatus_JewelNozzleUsedTime") {
+          val = value
+        } else if(name == "WHstatus_TotalLength") {
+          val = value
+        } else if(name == "WHstatus_TotalLength") {
+          val = value
+        } else if(name == "WHstatus_CutLength") {
+          val = value
+        } else if(name == "WHstatus_LinearAxisFeedrate") {
+          val = value
+        } else if (name == "WHstatus_RevAxisFeedrate") {
+          val = value
+        } else if(name == "WHstatus_HydraulicOilUsedTime") {
+          val = value
+        } else if(name == "WHstatus_SandBlastingHoseUsedTime") {
+          val = value
+        } else if(name == "WHstatus_ElpasedTime") {
+          val = value
         }
         return val
        } 

@@ -178,5 +178,7 @@ export const removeMachine = param => {
 }
 
 export const addMachines = param => {
-  return post(`${Interface.addMachines}?token=${user.token}`)
+  param.username = user.username;
+  param.openid = user.openid;
+  return post(`${Interface.addMachines}?token=${user.token}`,param)
 }

@@ -14,13 +14,13 @@
 	      <div v-show="this.pop=='add' ? true : false">
 	      	<el-form :label-position="labelPosition" label-width="80px" :model="formLabelAlign">
 					  <el-form-item label="设备号">
-					    <el-input v-model="formLabelAlign.name"></el-input>
+					    <el-input v-model="formLabelAlign.uuid"></el-input>
 					  </el-form-item>
 					  <el-form-item label="验证码">
-					    <el-input v-model="formLabelAlign.region"></el-input>
+					    <el-input v-model="formLabelAlign.vercode"></el-input>
 					  </el-form-item>
 					  <el-form-item label="别名">
-					    <el-input v-model="formLabelAlign.type"></el-input>
+					    <el-input v-model="formLabelAlign.alias"></el-input>
 					  </el-form-item>
 					</el-form>
 	      </div>
@@ -30,7 +30,8 @@
 	      </select>
 	      <span slot="footer" class="dialog-footer">
 	        <el-button @click="dialogVisible = false">取 消</el-button>
-	        <el-button type="primary" @click="saveParam()" >确 定</el-button>
+	        <el-button type="primary" @click="saveParam()" v-show="this.pop=='select' ? true : false">确 定</el-button>
+	        <el-button type="primary" @click="addParam()" v-show="this.pop=='add' ? true : false">确 定</el-button>
 	      </span>
 	    </el-dialog>
 	</div>
@@ -60,9 +61,9 @@ export default {
 			data:"请选择在此展示的参数",
 			labelPosition: 'right',
       formLabelAlign: {
-        name: '',
-        region: '',
-        type: ''
+        uuid: '',
+        vercode: '',
+        alias: ''
       },
 			obj:{
 				uuid:'',
@@ -114,6 +115,8 @@ export default {
 						that.dialogVisible = true;
 						that.chooseuuid = val.uuid;
 						that.param = res.data.value;
+					}else{
+						warning(res.data.result)
 					}
 				})
 		},
@@ -121,31 +124,54 @@ export default {
 			this.dialogVisible = true;
 			this.pop = "add";
 			this.data = "请输入新增的设备信息"
+
+		},
+    warning(res) {
+      this.$alert(res, '温馨提示', {
+        confirmButtonText: '确定',
+        callback: action => {
+          this.$message({
+            type: 'info',
+            message: `action: ${ action }`
+          });
+        }
+      });
+    },
+		addParam(){
+			console.log(this.formLabelAlign)
+			let that = this;
+			api.addMachines(this.formLabelAlign)
+				.then(function(res){
+					if(res.data.result == "success") {
+					console.log(res)
+						that.obj = {
+							uuid:that.formLabelAlign.uuid,
+							alias:that.formLabelAlign.alias,
+							item:"",
+							enable:true,
+							param:"加工进度"
+						}
+						that.allMachine.push(that.obj)
+					}
+				})
+				this.dialogVisible = false;
 		},
 		removeCard(res){
 			let that = this;
 			api.removeMachine({uuid:res.uuid})
 				.then(function(res){
 					if(res.data.result == "success"){
-						let arr = [];
-						that.allMachine.forEach(function(val){
+						that.allMachine.forEach(function(val,index){
 							if(res.uuid !== val.uuid){
-								let obj ={
-									uuid:res.uuid,
-      						alias:res.alias,
-      						item:res.item,
-      						enable:res.enable,
-      						param:that.selected.value
-								}
-								arr.push(obj)
+								that.allMachine.splice(index,1)
 							}
 						})
-						that.allMachine = arr;
 					}
 				})
 			console.log(this.allMachine)
 		},
 		saveParam(){
+			console.log("save")
 			this.dialogVisible = false;
         	let obj = {
         		uuid:this.chooseuuid,
