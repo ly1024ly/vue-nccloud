@@ -172,3 +172,11 @@ export const addMachine =(param) => {
 export const saveHomeParameter = param => {
   return put(`${Interface.saveHomeParameters}?username=${user.username}&openid=${user.openid}&uuid=${param.uuid}&item=${param.item}&token=${user.token}`)
 }
+
+export const removeMachine = param => {
+  return del(`${Interface.removeMachines}?openid=&username=${user.username}&uuid=${param.uuid}&token=${user.token}`)
+}
+
+export const addMachines = param => {
+  return post(`${Interface.addMachines}?token=${user.token}`)
+}
