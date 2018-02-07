@@ -18,6 +18,7 @@ import md5 from 'js-md5';
 import card from './card.vue';
 
   export default {
+    props:["lang"],
     data() {
       return {
         mqtuuid:[],
@@ -166,6 +167,9 @@ import card from './card.vue';
       },
       mqtuuid(value){
         
+      },
+      lang(val){
+        console.log(val)
       }
     }
   }

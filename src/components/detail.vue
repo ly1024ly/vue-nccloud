@@ -13,9 +13,9 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="card-content">
-      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :allMqttStatus="allMqttStatus" :item="item" :icon="false" :euuid="uuid"></card>
-      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard" :icon="true" v-on:showFeedv="getFeedv"></card>
-      <el-card class="box-card"  @click="dialogVisible = true">
+      <card v-for="(item,index) in getEcharts" :key="index" :WHstatus_ExecState="item"  :allMqttStatus="allMqttStatus" :item="item" :icon="false" :euuid="uuid" :lang="lang"></card>
+      <card v-for="(item,index) in innerCard" :key="index+allMqttStatus[0].data.length" :item="item"  :allMqttStatus="allMqttStatus" v-on:remove="removeCard" :icon="true" v-on:showFeedv="getFeedv" :lang="lang"></card>
+      <el-card class="box-card"  @click="dialogVisible = true" :lang="lang">
         <el-button type="text"  @click="dialogVisible = true;add=true"><i class="el-icon-circle-plus" ></i></el-button>
       </el-card>
     </div>
@@ -25,7 +25,7 @@
       width="30%"
       :before-close="handleClose">
       <select v-model="selected" v-show="add">
-        <option v-for="(item,index) in li" :key="index" :value="item">{{item.value}}</option>
+        <option v-for="(item,index) in li" :key="index" :value="item">{{lang=="English" ? item.key : item.value}}</option>
       </select>
       <div v-show="!add">确定要删除此参数吗?</div>
       <span slot="footer" class="dialog-footer">
@@ -51,6 +51,7 @@ import card from './card.vue';
 import Cookies from 'js-cookie'
 
   export default{
+    props:["lang"],
     data(){
       return {
         mqttDetail:{},
@@ -291,6 +292,7 @@ import Cookies from 'js-cookie'
         var _this = this;
         var detailMqtt = new NcMqttClient("ly1024", pass, function(_1, _2, _3, _4) {
             ar = [_1, _2, _3, _4];
+            console.log(ar)
               for(var i=0;i<_this.machineParameterList.length;i++){
                 if(ar[1]==_this.machineParameterList[i].key){
                   if(_this.innerText.length==0){

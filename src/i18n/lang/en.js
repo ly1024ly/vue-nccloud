@@ -1,13 +1,14 @@
 export const message ={
-    menu1:"News report to the police",
-    menu2:'Production monitoring',
-    menu3:'All the equipment',
+    menu1:"Message Alarm  ",
+    menu2:'Production Monitoring',
+    menu3:'All Equipment',
     menu4:'Intelligent alarm',
     menu5:'Help center',
-    menu6:'My collection',
-    menu7:'The user information',
-    menu8:'Custom template',
-    menu9:'More service',
-    menu10:'Safe to leave',
-    select:'Select equipment'
+    menu6:'My Favorites',
+    menu7:'User Info',
+    menu8:'Custom Template',
+    menu9:'More Services',
+    menu10:'Leave Safely',
+    select:'Select equipment',
+    stime:'start time'
 }

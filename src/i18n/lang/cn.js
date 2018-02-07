@@ -9,5 +9,6 @@ export const message = {
     menu8:'自定义模版',
     menu9:'更多服务',
     menu10:'安全离开',
-    select:'选择设备'
+    select:'选择设备',
+    stime:"开始时间"
 }

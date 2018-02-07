@@ -108,7 +108,7 @@
       <el-main>
       	<transition-group name="fade" mode="out-in">
           <div key="0" class='zaochen' v-show="show"><i class="el-icon-loading"></i></div>
-      		<router-view key="1" v-on:title="getTitle" v-on:success="warningSucc"></router-view>
+      		<router-view key="1" v-on:title="getTitle" v-on:success="warningSucc" :lang="language"></router-view>
       	</transition-group>
       </el-main>
     </el-container>
@@ -157,7 +157,7 @@ import Cookies from 'js-cookie'
           this.language = "中文";
           this.$i18n.locale = 'zh-CN';
       }else{
-          this.language = "英文English";
+          this.language = "English";
           this.$i18n.locale = 'zh-US';
       }
       if(this.$route.path=="/detail"){

@@ -28,7 +28,7 @@
           </div>
         </div>
         <div v-show="!show" >
-          <div class="uuid" >{{item.alias}}</div>
+          <div class="uuid" >{{lang=='English'&&!WHstatus_ExecState ? item.status : item.alias}}</div>
           <el-progress v-show="item.alias=='加工进度'" :text-inside="true" :stroke-width="18" v-if="item.status=='WHstatus_HadCompletedPercent'" :percentage="Number(item.value)"></el-progress>
           <div class="val" v-show="!echart" v-if="!WHstatus_ExecState">{{textVal(item)}}</div>
           <i v-if="item.alias=='进给速度'" class="el-icon-zoom-in" @click="feedv(item)"></i>
@@ -36,10 +36,10 @@
         </div>
         <div v-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_ExecState'">
           <div v-show="!echart" class="state" v-bind:style="{backgroundColor:bgcolor}" v-if="ExecState">{{state}}</div>
-          <div v-show="!echart" class="val">开始时间:{{item.time.split("T").join(" ")}}</div>
+          <div v-show="!echart" class="val">{{ $t("message.stime") }}:{{item.time.split("T").join(" ")}}</div>
         </div>
         <div v-else-if="WHstatus_ExecState&&WHstatus_ExecState.status == 'WHstatus_Timeline'? true : false">
-          <div class="pres">运行日志</div>
+          <div class="pres">{{lang=='English' ? "Run Log" : "运行日志"}}</div>
           <div class="log">
             <div class="first"></div>
             <div class="second"></div>
@@ -79,8 +79,9 @@
 <script type="text/javascript">
 import {mapState} from 'vuex'
 import echart from './echart.vue'
+import Cookies from 'js-cookie'
   export default{
-    props:['mqtuuid','item',"process","allMqttStatus","WHstatus_ExecState","icon","euuid","all","selected"],
+    props:['mqtuuid','item',"lang","process","allMqttStatus","WHstatus_ExecState","icon","euuid","all","selected"],
     data(){
       return {
         msg:"",
@@ -483,6 +484,9 @@ import echart from './echart.vue'
       },
       item:function(val){
 
+      },
+      lang(val){
+        console.log(val)
       },
       all(val){
         console.log(val)
